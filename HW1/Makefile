@@ -1,6 +1,6 @@
 UTILS_DIR = ./utils
 CXX = g++
-CXXFLAGS = -O3 -Wall
+CXXFLAGS = -std=c++11 -O3 -Wall
 EXECUTABLE = main.out
 
 .SUFFIXS: .CPP
