@@ -19,14 +19,16 @@ public:
     void create_triangle(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3);
     void create_sphere(float x, float y, float z, float r);
     void start_trace();
-    void create_scene();
     void output_file(char* path);
     ~Raytracer();
 
 private:
 
     void register_object(Object* object);
-    vec3 eye_transform(vec3 pos);
+    void calculate_transform();
+    void execute_eye_transform();
+    void create_scene();
+    void destroy_scene();
 
     const float distance = 1.0f;
 

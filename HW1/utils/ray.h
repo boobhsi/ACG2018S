@@ -7,11 +7,11 @@ class Ray
 {
 public:
     Ray(const vec3& to);
-    static void setOrigin(vec3& input);
-    static vec4 getOrigin();
+    //static void setOrigin(vec3& input);
+    //static vec4 getOrigin();
     vec4 getVector();
 private:
-    static vec4 origin;
+    //static vec4 origin;
     vec4 disVector;
 };
 

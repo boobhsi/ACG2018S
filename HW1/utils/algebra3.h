@@ -417,7 +417,7 @@ mat4& operator *= ( const float d );	    // multiplication by a constant
 mat4& operator /= ( const float d );	    // division by a constant
 vec4& operator [] ( int i);		    // indexing
 
-// special functions
+// special functionss
 
 mat4 transpose(void);			    // transpose
 mat4 inverse(void);				    // inverse

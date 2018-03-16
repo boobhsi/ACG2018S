@@ -71,7 +71,6 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    rt.create_scene();
     rt.start_trace();
     rt.output_file(argv[2]);
 }

@@ -24,7 +24,9 @@ void Raytracer::set_eye(vec3 input) {
 #endif
 
     eye_pos = input;
+    /*
     Ray::setOrigin(eye_pos);
+    */
 }
 
 void Raytracer::set_view_direction(vec3 input) {
@@ -60,13 +62,9 @@ void Raytracer::start_trace() {
 
     //left-hand coordinate
 
-    vec3 x_axis = always_up_axis ^ view_direction;
-    vec3 y_axis = x_axis ^ (-view_direction);
-
-#ifdef DEBUG
-    cout << "x_axis: (" << x_axis[0] << ", " << x_axis[1] << ", " << x_axis[2] << ")\n";
-    cout << "y_axis: (" << y_axis[0] << ", " << y_axis[1] << ", " << y_axis[2] << ")\n";
-#endif
+    create_scene();
+    calculate_transform();
+    execute_eye_transform();
 
     float width = 2 * distance * tan(fov / 2 / 180.0 * PI);
     float height = width / resolution[0] * resolution[1];
@@ -77,8 +75,7 @@ void Raytracer::start_trace() {
     cout << "width: " << width << ", height: " << height << ", width per pixel: " << width_per_pixel << ", height per pixel: " << height_per_pixel <<"\n";
 #endif
 
-    vec3 scene_center = eye_pos + view_direction * distance;
-    vec3 left_top_corner = scene_center - width / 2 * x_axis + height / 2 * y_axis;
+    vec3 left_top_corner(0.0f - width / 2, 0.0f + height / 2, distance);
 
 #ifdef DEBUG
     cout << "lt: (" << left_top_corner[0] << ", " << left_top_corner[1] << ", " << left_top_corner[2] << ")\n";
@@ -86,7 +83,7 @@ void Raytracer::start_trace() {
 
     for(int i = 0; i < resolution[1]; i++) {
         for(int j = 0; j < resolution[0]; j++) {
-            vec3 now_position = left_top_corner - i * height_per_pixel * y_axis + j * width_per_pixel * x_axis;
+            vec3 now_position(left_top_corner[0] + j * width_per_pixel, left_top_corner[1] - i * height_per_pixel, left_top_corner[2]);
             Ray tempRay(now_position);
             bool intersected = false;
             for(size_t k = 0; k < object_list.size(); k++) {
@@ -99,15 +96,70 @@ void Raytracer::start_trace() {
 }
 
 void Raytracer::create_scene() {
+    if(scene != nullptr) {
+        destroy_scene();
+    }
     scene = new bool*[resolution[1]];
     for(int i = 0; i < resolution[1]; i++) {
         scene[i] = new bool[resolution[0]];
     }
 }
 
-vec3 Raytracer::eye_transform(vec3 pos) {
-    //mistaken: no need to do anything
-    return pos;
+void Raytracer::destroy_scene() {
+
+}
+
+void Raytracer::calculate_transform() {
+    vec3 x_axis, y_axis;
+    if(view_direction == always_up_axis) {
+        x_axis.set(1.0f, 0.0f, 0.0f);
+        y_axis.set(0.0f, 0.0f, -1.0f);
+    }
+    else if(view_direction == -always_up_axis) {
+        x_axis.set(1.0f, 0.0f, 0.0f);
+        y_axis.set(0.0f, 0.0f, 1.0f);
+    }
+    else{
+        x_axis = always_up_axis ^ view_direction;
+        y_axis = x_axis ^ (-view_direction);
+    }
+
+#ifdef DEBUG
+    cout << "x_axis: (" << x_axis[0] << ", " << x_axis[1] << ", " <<x_axis[2] << ")\n";
+    cout << "y_axis: (" << y_axis[0] << ", " << y_axis[1] << ", " <<y_axis[2] << ")\n";
+#endif
+
+    vec4 temp;
+    temp.set(x_axis[0], x_axis[1], x_axis[2], 0.0f);
+    transform_matrix[0] = temp;
+    temp.set(y_axis[0], y_axis[1], y_axis[2], 0.0f);
+    transform_matrix[1] = temp;
+    temp.set(view_direction[0], view_direction[1], view_direction[2], 0.0f);
+    transform_matrix[2] = temp;
+    temp.set(eye_pos[0], eye_pos[1], eye_pos[2], 1.0f);
+    transform_matrix[3] = temp;
+
+#ifdef DEBUG
+    cout << transform_matrix[0][0] << ", " << transform_matrix[0][1] << ", " << transform_matrix[0][2] << ", " << transform_matrix[0][3] << ")\n";
+    cout << transform_matrix[1][0] << ", " << transform_matrix[1][1] << ", " << transform_matrix[1][2] << ", " << transform_matrix[1][3] << ")\n";
+    cout << transform_matrix[2][0] << ", " << transform_matrix[2][1] << ", " << transform_matrix[2][2] << ", " << transform_matrix[2][3] << ")\n";
+    cout << transform_matrix[3][0] << ", " << transform_matrix[3][1] << ", " << transform_matrix[3][2] << ", " << transform_matrix[3][3] << ")\n";
+#endif
+
+    transform_matrix = transform_matrix.inverse();
+
+#ifdef DEBUG
+    cout << transform_matrix[0][0] << ", " << transform_matrix[0][1] << ", " << transform_matrix[0][2] << ", " << transform_matrix[0][3] << ")\n";
+    cout << transform_matrix[1][0] << ", " << transform_matrix[1][1] << ", " << transform_matrix[1][2] << ", " << transform_matrix[1][3] << ")\n";
+    cout << transform_matrix[2][0] << ", " << transform_matrix[2][1] << ", " << transform_matrix[2][2] << ", " << transform_matrix[2][3] << ")\n";
+    cout << transform_matrix[3][0] << ", " << transform_matrix[3][1] << ", " << transform_matrix[3][2] << ", " << transform_matrix[3][3] << ")\n";
+#endif
+}
+
+void Raytracer::execute_eye_transform() {
+    for(size_t i = 0; i < object_list.size(); i++) {
+        object_list[i]->updateTransform(transform_matrix);
+    }
 }
 
 void Raytracer::register_object(Object* object) {
@@ -129,16 +181,20 @@ void Raytracer::create_triangle(float x1, float y1, float z1, float x2, float y2
     vec3 point1(x1, y1, z1); 
     vec3 point2(x2, y2, z2);
     vec3 point3(x3, y3, z3);
+    /*
     point1 = eye_transform(point1);
     point2 = eye_transform(point2);
     point3 = eye_transform(point3);
+    */
     current = new Triangle(point1[0], point1[1], point1[2], point2[0], point2[1], point2[2], point3[0], point3[1], point3[2]);
     register_object(current);
 }
 
 void Raytracer::create_sphere(float x, float y, float z, float r) {
     vec3 s_center(x, y, z);
+    /*
     s_center = eye_transform(s_center);
+    */
     current = new Sphere(s_center[0], s_center[1], s_center[2], r);
     register_object(current);
 }

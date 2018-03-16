@@ -10,6 +10,7 @@ class Object
 public:
     Object() {}
     virtual bool checkIntersection(Ray nRay) = 0;
+    virtual void updateTransform(const mat4& transform_matrix) = 0;
     virtual ~Object() {}
 };
 

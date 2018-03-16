@@ -1,5 +1,6 @@
 #include "ray.h"
 
+/*
 vec4 Ray::origin;
 
 void Ray::setOrigin(vec3& input) {
@@ -12,10 +13,12 @@ void Ray::setOrigin(vec3& input) {
 vec4 Ray::getOrigin() {
     return Ray::origin;
 }
+*/
 
 Ray::Ray(const vec3& to) {
-    vec4 temp(to, 1.0f);
-    disVector = temp - origin;
+    vec4 temp(to, 0.0f);
+    //disVector = temp - origin;
+    disVector = temp;
 }
 
 vec4 Ray::getVector() {
