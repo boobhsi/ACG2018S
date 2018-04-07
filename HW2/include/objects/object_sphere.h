@@ -1,10 +1,9 @@
 #ifndef OBJECT_SPHERE_H
 #define OBJECT_SPHERE_H
 
-#include "object.h"
-#include "algebra3.h"
-#include "ray.h"
-#include "material.h"
+#include <objects/object.h>
+#include <utils/algebra3.h>
+#include <raytracer/ray.h>
 
 class Sphere : public Object
 {

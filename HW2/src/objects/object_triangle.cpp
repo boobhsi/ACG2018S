@@ -1,4 +1,4 @@
-#include "object_triangle.h"
+#include <objects/object_triangle.h>
 
 #ifdef DEBUG
 #include <iostream>

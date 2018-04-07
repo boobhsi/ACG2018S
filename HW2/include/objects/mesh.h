@@ -1,10 +1,10 @@
 #ifndef MESH_H
 #define MESH_H
 
-#include "object.h"
-#include "material.h"
+#include <objects/object.h>
+#include <materials/material.h>
 #include <vector>
-#include "ray.h"
+#include <raytracer/ray.h>
 
 class Mesh {
 public:
@@ -18,6 +18,7 @@ public:
 private:
     Material mMaterial;
     vector<Object*> object_list;
+    bool rigid;
 };
 
 #endif

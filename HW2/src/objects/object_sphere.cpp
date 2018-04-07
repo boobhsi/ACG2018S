@@ -1,4 +1,4 @@
-#include "object_sphere.h"
+#include <objects/object_sphere.h>
 #include <cmath>
 
 #ifdef DEBUG

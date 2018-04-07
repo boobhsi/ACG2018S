@@ -1,4 +1,4 @@
-#include "ray.h"
+#include <raytracer/ray.h>
 
 #define AIR_D 1.0
 

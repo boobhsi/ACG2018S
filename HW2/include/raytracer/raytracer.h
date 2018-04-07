@@ -1,10 +1,11 @@
 #ifndef RAYTRACER_H
 #define RAYTRACER_H
 
-#include "utils/algebra3.h"
+#include <utils/algebra3.h>
 #include <vector>
-#include "utils/object.h"
-#include "utils/mesh.h"
+#include <objects/object.h>
+#include <objects/mesh.h>
+#include <lights/light.h>
 
 using namespace std;
 
@@ -43,6 +44,7 @@ private:
     float fov;
     int resolution[2];
     vector<Mesh*> mesh_list;
+    vector<Light*> light_list;
     Mesh* current;
     vec3** scene;
 };

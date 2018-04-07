@@ -1,8 +1,8 @@
 #ifndef RAY_H
 #define RAY_H
 
-#include "algebra3.h"
-#include "mesh.h"
+#include <utils/algebra3.h>
+#include <objects/mesh.h>
 #include <vector>
 
 using namespace std;

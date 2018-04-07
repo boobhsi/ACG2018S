@@ -2,7 +2,7 @@
 #include <fstream>
 #include <vector>
 #include "utils/parse_func.cpp"
-#include "raytracer.h"
+#include <raytracer/raytracer.h>
 #include <string>
 
 using namespace std;

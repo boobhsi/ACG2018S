@@ -1,9 +1,9 @@
 #ifndef OBJECT_TRIANGLE_H
 #define OBJECT_TRIANGLE_H
 
-#include "object.h"
-#include "algebra3.h"
-#include "ray.h"
+#include <objects/object.h>
+#include <utils/algebra3.h>
+#include <raytracer/ray.h>
 
 class Triangle : public Object
 {

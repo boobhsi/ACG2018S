@@ -1,7 +1,7 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
-#include "algebra3.h"
+#include <utils/algebra3.h>
 
 struct Material {
     vec3 color;

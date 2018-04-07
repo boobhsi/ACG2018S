@@ -2,8 +2,8 @@
 #define OBJECT_H
 
 #include <vector>
-#include "algebra3.h"
-#include "ray.h"
+#include <utils/algebra3.h>
+#include <raytracer/ray.h>
 
 typedef enum { FRONT, BACK, RIGID } Surface_type;
 

@@ -1,7 +1,8 @@
-#include "raytracer.h"
-#include "utils/object_sphere.h"
-#include "utils/object_triangle.h"
-#include "utils/imageIO.cpp"
+#include <raytracer/raytracer.h>
+#include <objects/object_sphere.h>
+#include <objects/object_triangle.h>
+#include <materials/material.h>
+#include "../utils/imageIO.cpp"
 #include <cmath>
 
 #ifdef DEBUG
