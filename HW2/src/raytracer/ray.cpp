@@ -33,7 +33,7 @@ vec4 Ray::getVector() {
 
 vec3 Ray::trace_the_world(const vector<Mesh*>& object_list, SHADING get_shading) {
     vec3 ray_color(0.0f, 0.0f, 0.0f), refraction_color(0.0f, 0.0f, 0.0f), reflection_color(0.0f, 0.0f, 0.0f), surface_color(0.0f, 0.0f, 0.0f);
-    float refra_ratio = 0.0f, refle_ratio = 0.0f;
+    vec2 scatter_ratio(0.0f, 0.0f);
     float min_t = -1.0f;
     int nearest_object = 0;
     Intersection_info nearest_intersection;
@@ -49,35 +49,34 @@ vec3 Ray::trace_the_world(const vector<Mesh*>& object_list, SHADING get_shading)
     }
     if(min_t > 0.0f) {
         Mesh* hit_mesh = object_list[nearest_object];
-        surface_color = get_shading(nearest_intersection.norm, hit_mesh->get_color(), hit_mesh->get_properties(), hit_mesh->get_specular());
-
-        switch(nearest_intersection.surface_type) {
-            case FRONT:
-                Ray refraction = get_refraction(nearest_intersection.intersect_point, AIR_D, hit_mesh->get_density(), nearest_intersection.norm);
-                if(refraction.get_recursive_num >= 0) { // no completed reflection
-                    refraction_color = refraction.trace_the_inside(hit_mesh, object_list, get_shading);
-                }
-                refra_ratio = hit_mesh->get_refraction_ratio();
-                Ray reflection = get_reflection(nearest_intersection.intersect_point, nearest_intersection.norm);
-                reflection_color = reflection.trace_the_world(object_list, get_shading);
-                refle_ratio = hit_mesh->get_reflection_ratio();
-                break;
-                /*
-            case BACK:
-                Ray refraction = get_refraction();
-                ray_color = refraction.trace_the_world(object_list);
-                break;
-                */
-            case RIGID:
-                Ray reflection = get_reflection(nearest_intersection.intersect_point, nearest_intersection.norm);
-                reflection_color = reflection.trace_the_world(object_list, get_shading);
-                refle_ratio = hit_mesh->get_reflection_ratio();
-                break;
-            default:
-                break;
+        surface_color = get_shading(nearest_intersection.intersect_point, this->getVector(), nearest_intersection.norm, hit_mesh->get_color(), hit_mesh->get_properties(), hit_mesh->get_specular(), nearest_object);
+        scatter_ratio = hit_mesh->get_scatter_ratio();
+        if(this->get_recursive_num() < RECURSIVE_LIMIT) {
+            switch(nearest_intersection.surface_type) {
+                case FRONT:
+                    Ray refraction = get_refraction(nearest_intersection.intersect_point, AIR_D, hit_mesh->get_density(), nearest_intersection.norm);
+                    if(refraction.get_recursive_num >= 0) { // no completed reflection
+                        refraction_color = refraction.trace_the_inside(hit_mesh, object_list, get_shading);
+                    }
+                    Ray reflection = get_reflection(nearest_intersection.intersect_point, nearest_intersection.norm);
+                    reflection_color = reflection.trace_the_world(object_list, get_shading);
+                    break;
+                    /*
+                case BACK:
+                    Ray refraction = get_refraction();
+                    ray_color = refraction.trace_the_world(object_list);
+                    break;
+                    */
+                case RIGID:
+                    Ray reflection = get_reflection(nearest_intersection.intersect_point, nearest_intersection.norm);
+                    reflection_color = reflection.trace_the_world(object_list, get_shading);
+                    break;
+                default:
+                    break;
+            }
         }
     }
-    ray_color = refra_ratio * refraction_color + refle_ratio + reflection_color + (1 - refle_ratio - refra_ratio) * surface_color;
+    ray_color = scatter_ratio[0] + reflection_color + scatter_ratio[1] * refraction_color + (1 - scatter_ratio[0] - scatter_ratio[1]) * surface_color;
     return ray_color;
 }
 
@@ -91,7 +90,7 @@ Ray Ray::get_refraction(vec4 point, float d_in, float d_out, vec4 norm) {
     }
     else {
         vec4 temp = (d_in / d_out) * disVector + (d_in / d_out * c - sqrt(1.0 - s_2)) * norm;
-        Ray new_ray(point, temp, recursive_num + 1);
+        Ray new_ray(point, temp, recursive_num);
         return new_ray;
     }
 }

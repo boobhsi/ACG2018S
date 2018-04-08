@@ -3,7 +3,8 @@
 
 #include <utils/algebra3.h>
 
-struct Material {
+struct Material 
+{
     vec3 color;
     vec3 surface_properties;
     float specular;

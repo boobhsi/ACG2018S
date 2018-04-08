@@ -6,7 +6,8 @@
 #include <vector>
 #include <raytracer/ray.h>
 
-class Mesh {
+class Mesh 
+{
 public:
     Mesh();
     ~Mesh();
@@ -18,8 +19,7 @@ public:
     vec3 get_color();
     vec3 get_properties();
     float get_specular();
-    float get_refraction_ratio();
-    float get_reflection_ratio();
+    vec2 get_scatter_ratio();
 private:
     Material mMaterial;
     vector<Object*> object_list;
