@@ -1,6 +1,7 @@
 #include <raytracer/ray.h>
 
 #define AIR_D 1.0
+#define SAME_POINT_THRESHOLD 0.0001
 
 /*
 vec4 Ray::origin;
@@ -113,4 +114,28 @@ vec3 Ray::trace_the_inside(Mesh* object_inside, const vector<Mesh*>& object_list
     return ray_color;
 }
 
-    int get_recursive_num();
+int Ray::get_recursive_num() {
+    return recursive_num;
+}
+
+int Ray::check_nearest(const vector<Mesh*>& object_list, vec4 point) {
+    float min_t = -1.0f;
+    int nearest_object = 0;
+    Intersection_info nearest_intersection;
+    for(size_t k = 0; k < object_list.size(); k++) {
+        Intersection_info intersected = object_list[k]->checkIntersection(*this);
+        if(!intersected.intersected) {
+            continue;
+        }
+        if(intersected.t > min_t) {
+            nearest_intersection = intersected;
+            nearest_object = k;
+        }
+    }
+    if(min_t > 0.0f && (nearest_intersection.intersect_point - point).length() < SAME_POINT_THRESHOLD) {
+        return nearest_object;
+    }
+    else{
+        return -1;
+    }
+}

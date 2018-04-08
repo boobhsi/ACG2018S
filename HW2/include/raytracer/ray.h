@@ -18,7 +18,7 @@ public:
     vec4 getVector();
     vec3 trace_the_world(const vector<Mesh*>& object_list, SHADING get_shading);
     vec3 trace_the_inside(Mesh* object_inside, const vector<Mesh*>& object_list, SHADING get_shading);
-    int check_nearest(const vector<Mesh*>& object_list);
+    int check_nearest(const vector<Mesh*>& object_list, vec4 point);
 private:
     vec4 origin;
     vec4 disVector;
