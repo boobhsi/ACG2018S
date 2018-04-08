@@ -4,6 +4,7 @@
 #include <utils/algebra3.h>
 #include <objects/mesh.h>
 #include <vector>
+#include <raytracer/raytracer.h>
 
 using namespace std;
 
@@ -13,7 +14,7 @@ public:
     Ray(const vec3& from, const vec3& to_dir, int num);
     vec4 getOrigin();
     vec4 getVector();
-    vec3 trace_the_world(const vector<Mesh*>& object_list);
+    vec3 trace_the_world(const vector<Mesh*>& object_list, SHADING get_shading);
     vec3 trace_the_inside(Mesh* object_inside, const vector<Mesh*>& object_list);
 private:
     vec4 origin;

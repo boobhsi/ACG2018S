@@ -33,3 +33,6 @@
 
 # Images
 *.ppm
+
+# For VScode
+.vscode/

@@ -31,7 +31,7 @@ vec4 Ray::getVector() {
     return disVector;
 }
 
-vec3 Ray::trace_the_world(const vector<Mesh*>& object_list) {
+vec3 Ray::trace_the_world(const vector<Mesh*>& object_list, SHADING get_shading) {
     vec3 ray_color;
     float min_t = -1.0f;
     int nearest_object = 0;
