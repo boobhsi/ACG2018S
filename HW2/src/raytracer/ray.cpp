@@ -32,7 +32,8 @@ vec4 Ray::getVector() {
 }
 
 vec3 Ray::trace_the_world(const vector<Mesh*>& object_list, SHADING get_shading) {
-    vec3 ray_color;
+    vec3 ray_color(0.0f, 0.0f, 0.0f), refraction_color(0.0f, 0.0f, 0.0f), reflection_color(0.0f, 0.0f, 0.0f), surface_color(0.0f, 0.0f, 0.0f);
+    float refra_ratio = 0.0f, refle_ratio = 0.0f;
     float min_t = -1.0f;
     int nearest_object = 0;
     Intersection_info nearest_intersection;
@@ -46,17 +47,20 @@ vec3 Ray::trace_the_world(const vector<Mesh*>& object_list, SHADING get_shading)
             nearest_object = k;
         }
     }
-    if(min_t < 0.0f) {
-        ray_color.set(0.0f, 0.0f, 0.0f);
-    }
-    else {
+    if(min_t > 0.0f) {
+        Mesh* hit_mesh = object_list[nearest_object];
+        surface_color = get_shading(nearest_intersection.norm, hit_mesh->get_color(), hit_mesh->get_properties(), hit_mesh->get_specular());
+
         switch(nearest_intersection.surface_type) {
             case FRONT:
-                vec3 refraction_color, reflection_color;
-                Ray refraction = get_refraction(nearest_intersection.intersect_point, AIR_D, object_list[nearest_object]->get_density(), nearest_intersection.norm); // TODO: to change density
-                refraction_color = refraction.trace_the_inside(object_list[nearest_object], object_list);
+                Ray refraction = get_refraction(nearest_intersection.intersect_point, AIR_D, hit_mesh->get_density(), nearest_intersection.norm);
+                if(refraction.get_recursive_num >= 0) { // no completed reflection
+                    refraction_color = refraction.trace_the_inside(hit_mesh, object_list, get_shading);
+                }
+                refra_ratio = hit_mesh->get_refraction_ratio();
                 Ray reflection = get_reflection(nearest_intersection.intersect_point, nearest_intersection.norm);
-                reflection_color = reflection.trace_the_world(object_list);
+                reflection_color = reflection.trace_the_world(object_list, get_shading);
+                refle_ratio = hit_mesh->get_reflection_ratio();
                 break;
                 /*
             case BACK:
@@ -66,12 +70,14 @@ vec3 Ray::trace_the_world(const vector<Mesh*>& object_list, SHADING get_shading)
                 */
             case RIGID:
                 Ray reflection = get_reflection(nearest_intersection.intersect_point, nearest_intersection.norm);
-                ray_color = reflection.trace_the_world(object_list);
+                reflection_color = reflection.trace_the_world(object_list, get_shading);
+                refle_ratio = hit_mesh->get_reflection_ratio();
                 break;
             default:
                 break;
         }
     }
+    ray_color = refra_ratio * refraction_color + refle_ratio + reflection_color + (1 - refle_ratio - refra_ratio) * surface_color;
     return ray_color;
 }
 
@@ -98,10 +104,14 @@ Ray Ray::get_reflection(vec4 point, vec4 norm) {
     return new_ray;
 }
 
-vec3 Ray::trace_the_inside(Mesh* object_inside, const vector<Mesh*>& object_list) {
-    vec3 ray_color;
+vec3 Ray::trace_the_inside(Mesh* object_inside, const vector<Mesh*>& object_list, SHADING get_shading) {
+    vec3 ray_color(0.0f, 0.0f, 0.0f);
     Intersection_info intersection = object_inside->checkIntersection(*this);
     Ray refraction = get_refraction(intersection.intersect_point, object_inside->get_density(), AIR_D, intersection.norm);
-    ray_color = refraction.trace_the_world(object_list);
+    if(refraction.get_recursive_num() >= 0) { // no completed reflection
+        ray_color = refraction.trace_the_world(object_list, get_shading);
+    }
     return ray_color;
 }
+
+    int get_recursive_num();

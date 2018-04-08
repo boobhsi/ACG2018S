@@ -15,6 +15,11 @@ public:
     void set_material(const Material& in);
     Intersection_info checkIntersection(Ray& nray);
     float get_density();
+    vec3 get_color();
+    vec3 get_properties();
+    float get_specular();
+    float get_refraction_ratio();
+    float get_reflection_ratio();
 private:
     Material mMaterial;
     vector<Object*> object_list;

@@ -90,7 +90,12 @@ void Raytracer::resigter_material(float r, float g, float b, float ka, float kd,
 
 void Raytracer::create_light(float x, float y, float z) {
     //TODO
-} 
+}
+
+vec3 get_shading(vec4 norm, vec3 color, vec3 properties, float specular) {
+    //TODO
+    //Phone shading formula
+}
     
 void Raytracer::start_trace() {
 
@@ -129,7 +134,7 @@ void Raytracer::start_trace() {
                 if(intersected) break;
             }
             */
-            scene[i][j] = tempRay.trace_the_world(mesh_list);
+            scene[i][j] = tempRay.trace_the_world(mesh_list, this->get_shading);
         }
     }
 }

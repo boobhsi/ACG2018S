@@ -64,3 +64,9 @@ Intersection_info Mesh::checkIntersection(Ray& nray) {
 float Mesh::get_density() {
     return mMaterial.density;
 }
+
+    vec3 get_color();
+    vec3 get_properties();
+    float get_specular();
+    float get_refraction_ratio();
+    float get_reflection_ratio();
