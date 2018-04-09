@@ -1,6 +1,6 @@
 #include <lights/light.h>
 
-Light::Light(vec4 pos, vec3 col) : position(pos), color(col)  {
+Light::Light(vec4 pos, vec3 col, float pow) : position(pos), color(col), power(pow) {
 
 }
 
@@ -17,5 +17,6 @@ vec3 Light::get_color() {
 }
 
 void Light::updateTransform(const mat4& transform_matrix) {
-    position_t = position * transform_matrix;
+    mat4 temp = transform_matrix;
+    position_t = position * temp;
 }

@@ -6,7 +6,10 @@
 #include <vector>
 #include <raytracer/raytracer.h>
 
+class Raytracer;
+
 #define RECURSIVE_LIMIT 5
+typedef vec3 (Raytracer::*SHADING)(vec4, vec4, vec4, vec3 , vec3 , float, int);
 
 using namespace std;
 
@@ -16,8 +19,8 @@ public:
     Ray(const vec3& from, const vec3& to_dir, int num);
     vec4 getOrigin();
     vec4 getVector();
-    vec3 trace_the_world(const vector<Mesh*>& object_list, SHADING get_shading);
-    vec3 trace_the_inside(Mesh* object_inside, const vector<Mesh*>& object_list, SHADING get_shading);
+    vec3 trace_the_world(const vector<Mesh*>& object_list);
+    vec3 trace_the_inside(Mesh* object_inside, const vector<Mesh*>& object_list);
     int check_nearest(const vector<Mesh*>& object_list, vec4 point);
 private:
     vec4 origin;

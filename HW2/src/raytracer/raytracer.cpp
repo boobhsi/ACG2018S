@@ -13,6 +13,7 @@ using namespace std;
 
 #define PI 3.14159265
 #define AMBIENT_ILLUSION 1
+#define LIGHT_POWER 5.0
 
 static vec3 always_up_axis(0.0, 1.0, 0.0);
 
@@ -99,12 +100,11 @@ void Raytracer::resigter_material(float r, float g, float b, float ka, float kd,
 void Raytracer::create_light(float x, float y, float z) {
     vec4 pos(x, y, z, 1.0f);
     vec3 color(1.0f, 1.0f, 1.0f);
-    Light* new_light = new PointLight(pos, color);
+    Light* new_light = new PointLight(pos, color, LIGHT_POWER);
     light_list.push_back(new_light);
 }
 
 vec3 Raytracer::get_shading(vec4 pos, vec4 view, vec4 norm, vec3 color, vec3 properties, float specular, int object_index) {
-    //TODO
     //For each light, check object occlusion?
     //If not, phone shading formulate
     vec3 total_illuminance = color * AMBIENT_ILLUSION * properties[0];
@@ -113,9 +113,10 @@ vec3 Raytracer::get_shading(vec4 pos, vec4 view, vec4 norm, vec3 color, vec3 pro
         Ray light_ray(light_pos, pos - light_pos, 0);
         int nearest = light_ray.check_nearest(mesh_list, pos); //self occlusion?
         if(nearest == object_index) { //arrive
-            total_illuminance += color * light_list[i]->get_color() * light_list[i]->get_illuminance() * properties[1] * ( norm * -light_ray.getVector() ); //diffuse
+            float ill = (light_list[i])->get_illuminance(pos);
+            total_illuminance += ( prod(color, light_list[i]->get_color()) * ill * properties[1] * ( norm * -light_ray.getVector() ) ); //diffuse
             vec4 half_vector = (-light_ray.getVector() + -view).normalize();
-            total_illuminance += light_list[i]->get_color() * light_list[i]->get_illuminance() * pow(half_vector * -view, specular);
+            total_illuminance += ( light_list[i]->get_color() * ill * pow(half_vector * -view, specular) );
         }
     }
     return total_illuminance;
@@ -158,7 +159,7 @@ void Raytracer::start_trace() {
                 if(intersected) break;
             }
             */
-            scene[i][j] = tempRay.trace_the_world(mesh_list, this->get_shading);
+            scene[i][j] = tempRay.trace_the_world(mesh_list);
         }
     }
 }
@@ -254,6 +255,9 @@ void Raytracer::calculate_transform() {
 void Raytracer::execute_eye_transform() {
     for(size_t i = 0; i < mesh_list.size(); i++) {
         mesh_list[i]->updateTransform(transform_matrix);
+    }
+    for(size_t i = 0; i < light_list.size(); i++) {
+        light_list[i]->updateTransform(transform_matrix);
     }
 }
 

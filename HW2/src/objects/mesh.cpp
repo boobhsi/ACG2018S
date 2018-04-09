@@ -1,5 +1,5 @@
 #include <objects/mesh.h>
-#include <assert>
+#include <cassert>
 
 using namespace std;
 
@@ -37,8 +37,8 @@ Intersection_info Mesh::checkIntersection(Ray& nray) {
     //find nearest object, return nearest surface
     Intersection_info nearest_intersect = object_list[0]->checkIntersection(nray);
     if(object_list.size() > 1) {
-        for(size_t i = 1; i < object_list[i]; i++) {
-            Intersection_info temp_intersect = object_list[i]->checkIntersection(nRay);
+        for(size_t i = 1; i < object_list.size(); i++) {
+            Intersection_info temp_intersect = object_list[i]->checkIntersection(nray);
             if(!temp_intersect.intersected) {
                 continue;
             }
@@ -46,7 +46,7 @@ Intersection_info Mesh::checkIntersection(Ray& nray) {
                 if(!nearest_intersect.intersected) {
                     nearest_intersect = temp_intersect;
                 }
-                else if(temp_intersect.t < nearest_intersect) {
+                else if(temp_intersect.t < nearest_intersect.t) {
                     nearest_intersect = temp_intersect;
                 }
                 else {
@@ -65,8 +65,18 @@ float Mesh::get_density() {
     return mMaterial.density;
 }
 
-    vec3 get_color();
-    vec3 get_properties();
-    float get_specular();
-    float get_refraction_ratio();
-    float get_reflection_ratio();
+vec3 Mesh::get_color() {
+    return mMaterial.color;
+}
+
+vec3 Mesh::get_properties() {
+    return mMaterial.surface_properties;
+};
+
+float Mesh::get_specular() {
+    return mMaterial.specular;
+}
+
+vec2 Mesh::get_scatter_ratio() {
+    return mMaterial.scatter_ratio;
+}

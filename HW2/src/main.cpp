@@ -7,8 +7,10 @@
 
 using namespace std;
 
+Raytracer* rt;
+
 int main(int argc, char* argv[]) {
-    Raytracer* rt = new Raytracer();;
+    rt = new Raytracer();;
     fstream input_file;
     input_file.open(argv[1], ios::in);
     char temp_char[200];

@@ -6,6 +6,12 @@
 #include <vector>
 #include <raytracer/ray.h>
 
+class Object;
+struct Intersection_info;
+class Ray;
+
+using namespace std;
+
 class Mesh 
 {
 public:

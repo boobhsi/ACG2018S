@@ -9,7 +9,8 @@
 
 using namespace std;
 
-typedef vec3 (*SHADING)(vec4, vec4, vec4, vec3 , vec3 , float, int);
+class Object;
+class Mesh;
 
 class Raytracer
 {

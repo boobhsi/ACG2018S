@@ -7,6 +7,8 @@
 
 typedef enum { FRONT, BACK, RIGID } Surface_type;
 
+class Ray;
+
 struct Intersection_info 
 {
     bool intersected;

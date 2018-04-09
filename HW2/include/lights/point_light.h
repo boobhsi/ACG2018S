@@ -7,9 +7,9 @@
 class PointLight : public Light
 {
 public:
-    PointLight(vec4 pos, vec3 color);
+    PointLight(vec4 pos, vec3 color, float pow);
     ~PointLight();
-    float get_illuminance();
+    float get_illuminance(vec4 pos);
 private:
 };
 
