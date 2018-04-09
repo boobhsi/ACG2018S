@@ -1,4 +1,5 @@
 #include <raytracer/ray.h>
+#include <iostream>
 
 #define AIR_D 1.0
 #define SAME_POINT_THRESHOLD 0.0001
@@ -152,7 +153,8 @@ int Ray::check_nearest(const vector<Mesh*>& object_list, vec4 point) {
             min_t = intersected.t;
         }
     }
-    if(have_intersected && (nearest_intersection.intersect_point - point).length() < SAME_POINT_THRESHOLD) {
+    if(have_intersected /*&& (nearest_intersection.intersect_point - point).length() < SAME_POINT_THRESHOLD*/) {
+        std::cout << "asdasd\n";
         return nearest_object;
     }
     else{

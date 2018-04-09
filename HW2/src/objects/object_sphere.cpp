@@ -42,7 +42,7 @@ Intersection_info Sphere::checkIntersection(Ray& nRay) {
         }
         else {
             intersect.t = small_t;
-            intersect.intersect_point = nRay.getVector() * big_t + nRay.getOrigin();
+            intersect.intersect_point = nRay.getVector() * small_t + nRay.getOrigin();
             intersect.norm = (intersect.intersect_point - centerR).normalize();
             intersect.surface_type = FRONT;
         }

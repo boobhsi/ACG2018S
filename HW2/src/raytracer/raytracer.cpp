@@ -13,7 +13,7 @@ using namespace std;
 
 #define PI 3.14159265
 #define AMBIENT_ILLUSION 1
-#define LIGHT_POWER 5.0
+#define LIGHT_POWER 100.0
 
 static vec3 always_up_axis(0.0, 1.0, 0.0);
 
@@ -61,7 +61,10 @@ void Raytracer::set_resolution(int w, int h) {
 }
 
 void Raytracer::create_mesh() {
-    register_mesh();
+#ifdef DEBUG
+    cout << "create mesh\n";
+#endif
+    if(current != nullptr) register_mesh();
     current = new Mesh();
 }
 
@@ -95,6 +98,9 @@ void Raytracer::resigter_material(float r, float g, float b, float ka, float kd,
     temp.scatter_ratio.set(refl, refr);
     temp.density = nr;
     current->set_material(temp);
+#ifdef DEBUG
+    cout << "insert material: (" << r << ", " << g << ", " << b << ", " << ka << ", " << kd << ", " << ks << ", " << exp << ", " << refl << ", " << refr << ", " << nr << ")" <<"\n";
+#endif
 }
 
 void Raytracer::create_light(float x, float y, float z) {
@@ -102,15 +108,23 @@ void Raytracer::create_light(float x, float y, float z) {
     vec3 color(1.0f, 1.0f, 1.0f);
     Light* new_light = new PointLight(pos, color, LIGHT_POWER);
     light_list.push_back(new_light);
+
+    #ifdef DEBUG
+    cout << "create light: (" << x << ", " << y << ", " << z << ")" <<"\n";
+    #endif
 }
 
 vec3 Raytracer::get_shading(vec4 pos, vec4 view, vec4 norm, vec3 color, vec3 properties, float specular, int object_index) {
     //For each light, check object occlusion?
     //If not, phone shading formulate
+    std::cout << pos[0] << ", " << pos[1] << ", " << pos[2] << ", " << pos[3] << std::endl;
     vec3 total_illuminance = color * AMBIENT_ILLUSION * properties[0];
     for(size_t i = 0; i < light_list.size(); i++) {
         vec4 light_pos = light_list[i]->get_position();
-        Ray light_ray(light_pos, pos - light_pos, 0);
+        std::cout << light_pos[0] << ", " << light_pos[1] << ", " << light_pos[2] << ", " << light_pos[3] << std::endl;
+        vec3 temp_light_pos(light_pos[0], light_pos[1], light_pos[2]);
+        vec3 temp_pos(pos[0], pos[1], pos[2]);
+        Ray light_ray(temp_light_pos, temp_pos - temp_light_pos, 0);
         int nearest = light_ray.check_nearest(mesh_list, pos); //self occlusion?
         if(nearest == object_index) { //arrive
             float ill = (light_list[i])->get_illuminance(pos);
@@ -125,6 +139,11 @@ vec3 Raytracer::get_shading(vec4 pos, vec4 view, vec4 norm, vec3 color, vec3 pro
 void Raytracer::start_trace() {
 
     register_mesh();
+    
+#ifdef DEBUG
+    cout << "mesh count: " << mesh_list.size() << endl;
+    cout << "light count: " << light_list.size() << endl;
+#endif
 
     //left-hand coordinate
 
@@ -142,7 +161,7 @@ void Raytracer::start_trace() {
 #endif
 
     vec3 left_top_corner(0.0f - width / 2, 0.0f + height / 2, distance);
-    vec3 eye(0.0f, 0.0f, 0.0f);
+    vec3 eye_o(0.0f, 0.0f, 0.0f);
 
 #ifdef DEBUG
     cout << "lt: (" << left_top_corner[0] << ", " << left_top_corner[1] << ", " << left_top_corner[2] << ")\n";
@@ -151,7 +170,7 @@ void Raytracer::start_trace() {
     for(int i = 0; i < resolution[1]; i++) {
         for(int j = 0; j < resolution[0]; j++) {
             vec3 now_position(left_top_corner[0] + j * width_per_pixel, left_top_corner[1] - i * height_per_pixel, left_top_corner[2]);
-            Ray tempRay(eye, now_position, 0);
+            Ray tempRay(eye_o, now_position, 0);
             /*
             bool intersected = false;
             for(size_t k = 0; k < object_list.size(); k++) {
@@ -162,25 +181,24 @@ void Raytracer::start_trace() {
             scene[i][j] = tempRay.trace_the_world(mesh_list);
         }
     }
+#ifdef DEBUG
+    cout << "trace over\n";
+#endif   
 }
 
 void Raytracer::output_file(char* path) {
     ColorImage image;
-    //TODO
- /*
+
     image.init(resolution[0], resolution[1]);
     for (int y=0; y<resolution[1]; y++) {
         for (int x=0; x<resolution[0]; x++) {
             Pixel p={0, 0, 0};
-            if(scene[y][x] == true) {
-                p.R = 255;
-                p.G = 255;
-                p.B = 255;
-            }
+            p.R = (int)(255.0f * min(scene[y][x][0], 1.0f));
+            p.G = (int)(255.0f * min(scene[y][x][1], 1.0f));
+            p.B = (int)(255.0f * min(scene[y][x][2], 1.0f));
             image.writePixel(x, y, p);
         }
     }
-    */
     image.outputPPM(path);
 }
 

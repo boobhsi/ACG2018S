@@ -24,9 +24,21 @@ Intersection_info Triangle::checkIntersection(Ray& nRay) {
     vec4 zero;
     zero[3] = 1.0f;
     mat4 spec(disVector_T[0], disVector_T[1], -nRay.getVector(), zero);
+#ifdef DEBUG
+    cout << spec[0][0] << ", " << spec[0][1] << ", " << spec[0][2] << ", " << spec[0][3] << ")\n";
+    cout << spec[1][0] << ", " << spec[1][1] << ", " << spec[1][2] << ", " << spec[1][3] << ")\n";
+    cout << spec[2][0] << ", " << spec[2][1] << ", " << spec[2][2] << ", " << spec[2][3] << ")\n";
+    cout << spec[3][0] << ", " << spec[3][1] << ", " << spec[3][2] << ", " << spec[3][3] << ")\n";
+#endif
     spec = spec.inverse();
     vec4 multi = nRay.getOrigin() - origin_T;
     //vec4 multi = - origin_T;
+#ifdef DEBUG
+    cout << spec[0][0] << ", " << spec[0][1] << ", " << spec[0][2] << ", " << spec[0][3] << ")\n";
+    cout << spec[1][0] << ", " << spec[1][1] << ", " << spec[1][2] << ", " << spec[1][3] << ")\n";
+    cout << spec[2][0] << ", " << spec[2][1] << ", " << spec[2][2] << ", " << spec[2][3] << ")\n";
+    cout << spec[3][0] << ", " << spec[3][1] << ", " << spec[3][2] << ", " << spec[3][3] << ")\n";
+#endif
     vec4 answer = multi * spec; //[s1, s2, t, a]
     Intersection_info intersect;
     if(answer[0] >=0.0f && answer[1] >= 0.0f && answer[0] + answer[1] <= 1.0f && answer[2] > 0.0f) {

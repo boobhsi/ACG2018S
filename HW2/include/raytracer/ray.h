@@ -8,7 +8,7 @@
 
 class Raytracer;
 
-#define RECURSIVE_LIMIT 5
+#define RECURSIVE_LIMIT 0
 typedef vec3 (Raytracer::*SHADING)(vec4, vec4, vec4, vec3 , vec3 , float, int);
 
 using namespace std;
