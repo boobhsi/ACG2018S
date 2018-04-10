@@ -38,11 +38,12 @@ Intersection_info Triangle::checkIntersection(Ray& nRay) {
     cout << spec[1][0] << ", " << spec[1][1] << ", " << spec[1][2] << ", " << spec[1][3] << ")\n";
     cout << spec[2][0] << ", " << spec[2][1] << ", " << spec[2][2] << ", " << spec[2][3] << ")\n";
     cout << spec[3][0] << ", " << spec[3][1] << ", " << spec[3][2] << ", " << spec[3][3] << ")\n";
+    cout << "("<< norm_T[0] << ", " << norm_T[1] << ", " << norm_T[2] << ", " << norm_T[3] << ")\n";
 #endif
     vec4 answer = multi * spec; //[s1, s2, t, a]
     Intersection_info intersect;
     if(answer[0] >=0.0f && answer[1] >= 0.0f && answer[0] + answer[1] <= 1.0f && answer[2] > 0.0f) {
-        if(nRay.getVector().normalize() * norm_T > 0.0) { //the front face
+        if((nRay.getVector() * norm_T) < 0.0) { //the front face
             intersect.intersected = true;
             intersect.norm = norm_T;
             intersect.t = answer[2];
@@ -54,7 +55,8 @@ Intersection_info Triangle::checkIntersection(Ray& nRay) {
             intersect.norm = -norm_T;
             intersect.t = answer[2];
             intersect.intersect_point = origin_T + answer[0] * disVector_T[0] + answer[1] * disVector_T[1];
-            intersect.surface_type = BACK;
+            //intersect.surface_type = BACK;
+            intersect.surface_type = FRONT; //hw2
         }
     }
     else {

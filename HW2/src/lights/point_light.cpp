@@ -10,8 +10,9 @@ PointLight::~PointLight() {
 }
 
 float PointLight::get_illuminance(vec4 pos) {
-    float distance = (pos - position_t).length();
+    float distance = (pos - position_t).length2();
     assert(distance > 0.001f);
-    float i = power / pow(distance, 2.0);
+    float i = power / distance;
+    //i = power;
     return i;
 }

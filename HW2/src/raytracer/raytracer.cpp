@@ -13,7 +13,7 @@ using namespace std;
 
 #define PI 3.14159265
 #define AMBIENT_ILLUSION 1
-#define LIGHT_POWER 100.0
+#define LIGHT_POWER 80.0
 
 static vec3 always_up_axis(0.0, 1.0, 0.0);
 
@@ -117,11 +117,10 @@ void Raytracer::create_light(float x, float y, float z) {
 vec3 Raytracer::get_shading(vec4 pos, vec4 view, vec4 norm, vec3 color, vec3 properties, float specular, int object_index) {
     //For each light, check object occlusion?
     //If not, phone shading formulate
-    std::cout << pos[0] << ", " << pos[1] << ", " << pos[2] << ", " << pos[3] << std::endl;
-    vec3 total_illuminance = color * AMBIENT_ILLUSION * properties[0];
+    vec3 total_illuminance;
+    total_illuminance = color * AMBIENT_ILLUSION * properties[0];
     for(size_t i = 0; i < light_list.size(); i++) {
-        vec4 light_pos = light_list[i]->get_position();
-        std::cout << light_pos[0] << ", " << light_pos[1] << ", " << light_pos[2] << ", " << light_pos[3] << std::endl;
+        vec4 light_pos = light_list[i]->get_position(); 
         vec3 temp_light_pos(light_pos[0], light_pos[1], light_pos[2]);
         vec3 temp_pos(pos[0], pos[1], pos[2]);
         Ray light_ray(temp_light_pos, temp_pos - temp_light_pos, 0);
@@ -130,7 +129,7 @@ vec3 Raytracer::get_shading(vec4 pos, vec4 view, vec4 norm, vec3 color, vec3 pro
             float ill = (light_list[i])->get_illuminance(pos);
             total_illuminance += ( prod(color, light_list[i]->get_color()) * ill * properties[1] * ( norm * -light_ray.getVector() ) ); //diffuse
             vec4 half_vector = (-light_ray.getVector() + -view).normalize();
-            total_illuminance += ( light_list[i]->get_color() * ill * pow(half_vector * -view, specular) );
+            total_illuminance += ( light_list[i]->get_color() * ill * pow(half_vector * norm, specular) );
         }
     }
     return total_illuminance;
@@ -178,7 +177,7 @@ void Raytracer::start_trace() {
                 if(intersected) break;
             }
             */
-            scene[i][j] = tempRay.trace_the_world(mesh_list);
+            scene[i][j] = tempRay.trace_the_world(mesh_list, mesh_list.size());
         }
     }
 #ifdef DEBUG
@@ -193,13 +192,42 @@ void Raytracer::output_file(char* path) {
     for (int y=0; y<resolution[1]; y++) {
         for (int x=0; x<resolution[0]; x++) {
             Pixel p={0, 0, 0};
-            p.R = (int)(255.0f * min(scene[y][x][0], 1.0f));
-            p.G = (int)(255.0f * min(scene[y][x][1], 1.0f));
-            p.B = (int)(255.0f * min(scene[y][x][2], 1.0f));
+            if(scene[y][x][0] == 0.0f) p.R = 0;
+            else if(scene[y][x][0] >= 1.0f) p.R = 255;
+            else p.R = (unsigned char)floor(scene[y][x][0] * 255.0f);
+            
+            if(scene[y][x][1] == 0.0f) p.G = 0;
+            else if(scene[y][x][1] >= 1.0f) p.G = 255;
+            else p.G = (unsigned char)floor(scene[y][x][1] * 255.0f);
+            
+            if(scene[y][x][2] == 0.0f) p.B = 0;
+            else if(scene[y][x][2] >= 1.0f) p.B = 255;
+            else p.B = (unsigned char)floor(scene[y][x][2] * 255.0f); 
+
+            assert(p.R < 256 && p.R >= 0);
+            assert(p.G < 256 && p.G >= 0);
+            assert(p.B < 256 && p.B >= 0);
+            
+
+            //p.R = (unsigned char)(255.0f * min(scene[y][x][0], 1.0f));
+            //p.G = (unsigned char)(255.0f * min(scene[y][x][1], 1.0f));
+            //p.B = (unsigned char)(255.0f * min(scene[y][x][2], 1.0f));
+#ifdef DEBUG
+    //cout << p.R << ", " << p.G << ", " << p.B << endl;
+#endif            
             image.writePixel(x, y, p);
         }
     }
     image.outputPPM(path);
+#ifdef DEBUG
+    vec3 temp(0.0, 0.0, 0.0);
+    vec4 temp4(0.0, 0.0, 0.0, 0.0);
+    vec4 temp_norm(0.0, 1.0, 0.0, 0.0);
+    vec3 temp_ray(1.0, -1.0, 0.0);
+    Ray test_refraction(temp, temp_ray, 0);
+    Ray new_temp = test_refraction.get_refraction(temp4, 1.0, 2.0, temp_norm);
+    cout << "test_result: (" << new_temp.getVector()[0] << ", " << new_temp.getVector()[1] << ", " << new_temp.getVector()[2] << ", " << new_temp.getVector()[3] << ")\n";
+#endif
 }
 
 Raytracer::~Raytracer() {

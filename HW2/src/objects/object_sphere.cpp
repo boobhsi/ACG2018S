@@ -36,14 +36,14 @@ Intersection_info Sphere::checkIntersection(Ray& nRay) {
         if(small_t < 0.0f) {
             //inside the sphere
             intersect.t = big_t;
-            intersect.intersect_point = nRay.getVector() * big_t + nRay.getOrigin();
-            intersect.norm = (centerR - intersect.intersect_point).normalize();
+            intersect.intersect_point = d * big_t + o;
+            intersect.norm = (centerR_T - intersect.intersect_point).normalize();
             intersect.surface_type = BACK;
         }
         else {
             intersect.t = small_t;
-            intersect.intersect_point = nRay.getVector() * small_t + nRay.getOrigin();
-            intersect.norm = (intersect.intersect_point - centerR).normalize();
+            intersect.intersect_point = d * small_t + o;
+            intersect.norm = (intersect.intersect_point - centerR_T).normalize();
             intersect.surface_type = FRONT;
         }
     }

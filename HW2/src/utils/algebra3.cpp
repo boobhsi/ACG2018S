@@ -50,6 +50,7 @@
 #include <math.h>
 #include <utils/algebra3.h>
 #include <ctype.h>
+#include <cassert>
 
 /****************************************************************
 *								*
@@ -645,6 +646,7 @@ mat3 mat3::inverse(void)      // Gauss-Jordan elimination with partial pivoting
     swap(b.v[i1], b.v[j]);
 
     // Scale row j to have a unit diagonal
+    assert(a.v[j].n[j]!=0.);
     if (a.v[j].n[j]==0.)
 	VEC_ERROR("mat3::inverse: singular matrix; can't invert\n");
     b.v[j] /= a.v[j].n[j];
@@ -821,6 +823,7 @@ mat4 mat4::inverse(void)   // Gauss-Jordan elimination with partial pivoting
     swap(a.v[i1], a.v[j]);
     swap(b.v[i1], b.v[j]);
 
+    assert(a.v[j].n[j]!=0.);
     // Scale row j to have a unit diagonal
     if (a.v[j].n[j]==0.)
 	VEC_ERROR("mat4::inverse: singular matrix; can't invert\n");
