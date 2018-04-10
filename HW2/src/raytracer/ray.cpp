@@ -106,7 +106,6 @@ vec3 Ray::trace_the_world(const vector<Mesh*>& object_list, size_t object_index)
 
 Ray Ray::get_refraction(vec4 point, float d_in, float d_out, vec4 norm) {
     float c = -(norm * disVector);
-    cout << c << endl;
     float s_2 = (1.0f - c * c) * pow(d_in / d_out, 2.0);
     if(s_2 > 1) {
         vec3 temp(1.0f, 0.0f, 0.0f); //fake
