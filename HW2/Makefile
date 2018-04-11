@@ -1,4 +1,4 @@
-INCLUDE_DIR = "/home/mhlee/ACG2018S/HW2/include"
+INCLUDE_DIR = "include"
 CXX = g++
 CXXFLAGS = -O3 -Wall -I ${INCLUDE_DIR} -std=c++11
 EXECUTABLE = main.out

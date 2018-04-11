@@ -13,7 +13,7 @@ using namespace std;
 
 #define PI 3.14159265
 #define AMBIENT_ILLUSION 1
-#define LIGHT_POWER 1.0
+#define LIGHT_POWER 20.0
 
 static vec3 always_up_axis(0.0, 1.0, 0.0);
 

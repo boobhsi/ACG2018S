@@ -100,7 +100,7 @@ vec3 Ray::trace_the_world(const vector<Mesh*>& object_list, size_t object_index)
             }
         }
     }
-    ray_color = (scatter_ratio[0] * reflection_color) + (scatter_ratio[1] * refraction_color) + ( (1.0f - scatter_ratio[0] - scatter_ratio[1]) * surface_color);
+    ray_color = (scatter_ratio[0] * reflection_color) + (scatter_ratio[1] * refraction_color) + (  surface_color);
     return ray_color;
 }
 
