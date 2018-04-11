@@ -662,6 +662,38 @@ mat3 mat3::inverse(void)      // Gauss-Jordan elimination with partial pivoting
     return b;
 }
 
+bool mat3::inverse(mat3& in) {
+    mat3 a(in),	    // As a evolves from original mat into identity
+	 b(identity2D());   // b evolves from identity into inverse(a)
+    int	 i, j, i1;
+
+    // Loop over cols of a from left to right, eliminating above and below diag
+    for (j=0; j<3; j++) {   // Find largest pivot in column j among rows j..2
+    i1 = j;		    // Row with largest pivot candidate
+    for (i=j+1; i<3; i++)
+	if (fabs(a.v[i].n[j]) > fabs(a.v[i1].n[j]))
+	    i1 = i;
+
+    // Swap rows i1 and j in a and b to put pivot on diagonal
+    swap(a.v[i1], a.v[j]);
+    swap(b.v[i1], b.v[j]);
+
+    // Scale row j to have a unit diagonal
+    if (a.v[j].n[j]==0.) return false;
+    b.v[j] /= a.v[j].n[j];
+    a.v[j] /= a.v[j].n[j];
+
+    // Eliminate off-diagonal elems in col j of a, doing identical ops to b
+    for (i=0; i<3; i++)
+	if (i!=j) {
+	b.v[i] -= a.v[i].n[j]*b.v[j];
+	a.v[i] -= a.v[i].n[j]*a.v[j];
+	}
+    }
+    in = b;
+    return true;
+}
+
 mat3& mat3::apply(V_FCT_PTR fct) {
     v[VX].apply(fct);
     v[VY].apply(fct);
@@ -838,6 +870,38 @@ mat4 mat4::inverse(void)   // Gauss-Jordan elimination with partial pivoting
 	}
     }
     return b;
+}
+
+bool mat4::inverse(mat4& in)   // Gauss-Jordan elimination with partial pivoting
+{
+    mat4 a(in),	    // As a evolves from original mat into identity
+	 b(identity3D());   // b evolves from identity into inverse(a)
+    int i, j, i1;
+
+    // Loop over cols of a from left to right, eliminating above and below diag
+    for (j=0; j<4; j++) {   // Find largest pivot in column j among rows j..3
+    i1 = j;		    // Row with largest pivot candidate
+    for (i=j+1; i<4; i++)
+	if (fabs(a.v[i].n[j]) > fabs(a.v[i1].n[j]))
+	i1 = i;
+
+    // Swap rows i1 and j in a and b to put pivot on diagonal
+    swap(a.v[i1], a.v[j]);
+    swap(b.v[i1], b.v[j]);
+
+    if (a.v[j].n[j]==0.) return false;
+    b.v[j] /= a.v[j].n[j];
+    a.v[j] /= a.v[j].n[j];
+
+    // Eliminate off-diagonal elems in col j of a, doing identical ops to b
+    for (i=0; i<4; i++)
+	if (i!=j) {
+	b.v[i] -= a.v[i].n[j]*b.v[j];
+	a.v[i] -= a.v[i].n[j]*a.v[j];
+	}
+    }
+    in = b;
+    return true;
 }
 
 mat4& mat4::apply(V_FCT_PTR fct)

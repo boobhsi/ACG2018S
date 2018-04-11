@@ -356,6 +356,7 @@ vec3& operator [] ( int i);		    // indexing
 
 mat3 transpose(void);			    // transpose
 mat3 inverse(void);			    // inverse
+static bool inverse(mat3&);
 mat3& apply(V_FCT_PTR fct);		    // apply a func. to each element
 void print( FILE *file, char *name );       // print matrix to a file
 void set(const vec3& v0, const vec3& v1, const vec3& v2);
@@ -420,7 +421,8 @@ vec4& operator [] ( int i);		    // indexing
 // special functionss
 
 mat4 transpose(void);			    // transpose
-mat4 inverse(void);				    // inverse
+mat4 inverse(void);
+static bool inverse(mat4&);			    // inverse
 mat4& apply(V_FCT_PTR fct);		    // apply a func. to each element
 void print( FILE *file, char *name );       // print matrix to a file
 void swap_rows( int i, int j );             // swap rows i and j

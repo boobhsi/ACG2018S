@@ -13,7 +13,7 @@ using namespace std;
 
 #define PI 3.14159265
 #define AMBIENT_ILLUSION 1
-#define LIGHT_POWER 80.0
+#define LIGHT_POWER 1.0
 
 static vec3 always_up_axis(0.0, 1.0, 0.0);
 
@@ -128,8 +128,8 @@ vec3 Raytracer::get_shading(vec4 pos, vec4 view, vec4 norm, vec3 color, vec3 pro
         if(nearest == object_index) { //arrive
             float ill = (light_list[i])->get_illuminance(pos);
             total_illuminance += ( prod(color, light_list[i]->get_color()) * ill * properties[1] * ( norm * -light_ray.getVector() ) ); //diffuse
-            vec4 half_vector = (-light_ray.getVector() + -view).normalize();
-            total_illuminance += ( light_list[i]->get_color() * ill * pow(half_vector * norm, specular) );
+            vec4 half_vector = (-light_ray.getVector() + -view).normalize();          
+            total_illuminance += ( light_list[i]->get_color() * ill * pow(half_vector * norm, specular) * properties[2]);
         }
     }
     return total_illuminance;
