@@ -127,9 +127,13 @@ vec3 Raytracer::get_shading(vec4 pos, vec4 view, vec4 norm, vec3 color, vec3 pro
         int nearest = light_ray.check_nearest(mesh_list, pos); //self occlusion?
         if(nearest == object_index) { //arrive
             float ill = (light_list[i])->get_illuminance(pos);
-            total_illuminance += ( prod(color, light_list[i]->get_color()) * ill * properties[1] * ( norm * -light_ray.getVector() ) ); //diffuse
-            vec4 half_vector = (-light_ray.getVector() + -view).normalize();          
-            total_illuminance += ( light_list[i]->get_color() * ill * pow(half_vector * norm, specular) * properties[2]);
+            float temp = norm * -light_ray.getVector();
+            temp = temp <= 0.0f ? 0.0f : temp;
+            total_illuminance += ( prod(color, light_list[i]->get_color()) * ill * properties[1] * ( temp ) ); //diffuse
+            vec4 half_vector = (-light_ray.getVector() + -view).normalize();
+            temp = half_vector * norm;
+            temp = temp <= 0.0f ? 0.0f : temp;
+            total_illuminance += ( light_list[i]->get_color() * ill * pow(temp, specular) * properties[2]);
         }
     }
     return total_illuminance;
