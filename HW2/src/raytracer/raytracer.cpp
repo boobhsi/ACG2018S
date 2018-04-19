@@ -5,11 +5,9 @@
 #include "../utils/imageIO.cpp"
 #include <cmath>
 #include <lights/point_light.h>
-
-#ifdef DEBUG
 #include <iostream>
+#include <fstream>
 using namespace std;
-#endif
 
 #define PI 3.14159265
 #define AMBIENT_ILLUSION 1
@@ -90,6 +88,11 @@ void Raytracer::create_triangle(float x1, float y1, float z1, float x2, float y2
     attach_object(new_triangle);
 }
 
+void Raytracer::create_triangle(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float n1, float n2, float n3) {
+    Object* new_triangle = new Triangle(x1, y1, z1, x2, y2, z2, x3, y3, z3, n1, n2, n3);
+    attach_object(new_triangle);
+}
+
 void Raytracer::resigter_material(float r, float g, float b, float ka, float kd, float ks, float exp, float refl, float refr, float nr) {
     Material temp;
     temp.color.set(r, g, b);
@@ -140,7 +143,6 @@ vec3 Raytracer::get_shading(vec4 pos, vec4 view, vec4 norm, vec3 color, vec3 pro
 }
     
 void Raytracer::start_trace() {
-
     register_mesh();
     
 #ifdef DEBUG
@@ -149,6 +151,8 @@ void Raytracer::start_trace() {
 #endif
 
     //left-hand coordinate
+
+
 
     create_scene();
     calculate_transform();
@@ -170,6 +174,9 @@ void Raytracer::start_trace() {
     cout << "lt: (" << left_top_corner[0] << ", " << left_top_corner[1] << ", " << left_top_corner[2] << ")\n";
 #endif
 
+    cal_num = 0;
+    sTime = clock();
+
     for(int i = 0; i < resolution[1]; i++) {
         for(int j = 0; j < resolution[0]; j++) {
             vec3 now_position(left_top_corner[0] + j * width_per_pixel, left_top_corner[1] - i * height_per_pixel, left_top_corner[2]);
@@ -184,6 +191,9 @@ void Raytracer::start_trace() {
             scene[i][j] = tempRay.trace_the_world(mesh_list, mesh_list.size());
         }
     }
+
+    eTime = clock();
+
 #ifdef DEBUG
     cout << "trace over\n";
 #endif   
@@ -232,6 +242,24 @@ void Raytracer::output_file(char* path) {
     Ray new_temp = test_refraction.get_refraction(temp4, 1.0, 2.0, temp_norm);
     cout << "test_result: (" << new_temp.getVector()[0] << ", " << new_temp.getVector()[1] << ", " << new_temp.getVector()[2] << ", " << new_temp.getVector()[3] << ")\n";
 #endif
+
+    ofstream file;
+    file.open("benchmark.txt", ios::out | ios::trunc);
+    if(!file) {
+        cout << "open file error" <<endl;
+    }
+    double sec = (eTime - sTime) / (double)(CLOCKS_PER_SEC);
+    int hr = 0, min = 0;
+    if(sec > 3600.0) {
+        hr = sec / 3600.0;
+        sec -= 3600.0 * hr;
+    }
+    if(sec > 60.0) {
+        min = sec / 60.0;
+        sec -= 60.0 * min;
+    }
+    file << "Duration: " << hr << ":" << min << ":" << sec << endl;
+    file << "Primitives: " << cal_num <<endl;
 }
 
 Raytracer::~Raytracer() {
@@ -328,3 +356,8 @@ void Raytracer::destroy_scene() {
     delete [] scene;
     scene = nullptr;
 }
+
+void Raytracer::cal_once() {
+    cal_num += 1;
+}
+long long int Raytracer::cal_num;

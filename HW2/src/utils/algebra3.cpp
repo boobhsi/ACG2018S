@@ -856,8 +856,7 @@ mat4 mat4::inverse(void)   // Gauss-Jordan elimination with partial pivoting
 
     //assert(a.v[j].n[j]!=0.);
     // Scale row j to have a unit diagonal
-    if (a.v[j].n[j]==0.)
-	VEC_ERROR("mat4::inverse: singular matrix; can't invert\n");
+    if (a.v[j].n[j]==0.) return false;
     b.v[j] /= a.v[j].n[j];
     a.v[j] /= a.v[j].n[j];
 

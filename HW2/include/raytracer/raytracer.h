@@ -6,6 +6,7 @@
 #include <objects/object.h>
 #include <objects/mesh.h>
 #include <lights/light.h>
+#include <ctime>
 
 using namespace std;
 
@@ -24,6 +25,7 @@ public:
     void create_mesh();
     void create_sphere(float x, float y, float z, float r);
     void create_triangle(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3);
+    void create_triangle(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float n1, float n2, float n3);
     void resigter_material(float r, float g, float b, float ka, float kd, float ks, float exp, float refl, float refr, float nr);
     void create_light(float x, float y, float z);
     vec3 get_shading(vec4 pos, vec4 view, vec4 norm, vec3 color, vec3 properties, float specular, int object_index); 
@@ -31,7 +33,13 @@ public:
     void output_file(char* path);
     ~Raytracer();
 
+    static void cal_once();
+
 private:
+
+    static long long int cal_num;
+
+    clock_t sTime, eTime;
 
     void attach_object(Object* object);
     void register_mesh();

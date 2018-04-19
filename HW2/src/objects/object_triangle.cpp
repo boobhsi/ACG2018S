@@ -1,9 +1,12 @@
 #include <objects/object_triangle.h>
+#include <raytracer/raytracer.h>
 
 #ifdef DEBUG
 #include <iostream>
 using namespace std;
 #endif
+
+extern Raytracer* rt;
 
 Triangle::Triangle(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3) {
     origin.set(x1, y1, z1, 1.0f);
@@ -11,6 +14,12 @@ Triangle::Triangle(float x1, float y1, float z1, float x2, float y2, float z2, f
     disVector[0] -= origin;
     disVector[1].set(x3, y3, z3, 1.0f);
     disVector[1] -= origin;
+
+    vec3 temp1(disVector[0][0], disVector[0][1], disVector[0][2]), temp2(disVector[1][0], disVector[1][1], disVector[1][2]);
+    vec3 temp3;
+    temp3 = temp1 ^ temp2;
+
+    norm.set(temp3[0], temp3[1], temp3[2], 0.0f);
 
 #ifdef DEBUG
     cout << "origin: (" << origin[0] << ", " << origin[1] << ", " << origin[2] << ", " << origin[3] << ")\n";
@@ -20,7 +29,19 @@ Triangle::Triangle(float x1, float y1, float z1, float x2, float y2, float z2, f
 
 }
 
+Triangle::Triangle(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, float n1, float n2, float n3) {
+    origin.set(x1, y1, z1, 1.0f);
+    disVector[0].set(x2, y2, z2, 1.0f);
+    disVector[0] -= origin;
+    disVector[1].set(x3, y3, z3, 1.0f);
+    disVector[1] -= origin;
+    norm.set(n1, n2, n3, 0.0f);
+}
+
 Intersection_info Triangle::checkIntersection(Ray& nRay) {
+
+    rt->cal_once();
+
     vec4 zero;
     zero[3] = 1.0f;
     mat4 spec(disVector_T[0], disVector_T[1], -nRay.getVector(), zero);
@@ -56,11 +77,10 @@ Intersection_info Triangle::checkIntersection(Ray& nRay) {
         }
         else {
             intersect.intersected = true;
-            intersect.norm = -norm_T;
+            intersect.norm = norm_T;
             intersect.t = answer[2];
             intersect.intersect_point = origin_T + answer[0] * disVector_T[0] + answer[1] * disVector_T[1];
-            //intersect.surface_type = BACK;
-            intersect.surface_type = FRONT; //hw2
+            intersect.surface_type = BACK;
         }
     }
     else {
@@ -82,13 +102,14 @@ void Triangle::updateTransform(const mat4& transform_matrix) {
     origin_T = origin * temp;
     disVector_T[0] = disVector[0] * temp;
     disVector_T[1] = disVector[1] * temp;
+    norm_T = norm * temp;
 
-    vec3 temp1, temp2, temp_norm;
-    temp1.set(disVector_T[0][0], disVector_T[0][1], disVector_T[0][2]);
-    temp2.set(disVector_T[1][0], disVector_T[1][1], disVector_T[1][2]);
-    temp_norm = temp1 ^ temp2;
-    temp_norm = temp_norm.normalize();
-    norm_T.set(temp_norm[0], temp_norm[1], temp_norm[2], 0.0f);
+    //vec3 temp1, temp2, temp_norm;
+    //temp1.set(disVector_T[0][0], disVector_T[0][1], disVector_T[0][2]);
+    //temp2.set(disVector_T[1][0], disVector_T[1][1], disVector_T[1][2]);
+    //temp_norm = temp1 ^ temp2;
+    //temp_norm = temp_norm.normalize();
+    //norm_T.set(temp_norm[0], temp_norm[1], temp_norm[2], 0.0f);
 
 #ifdef DEBUG
     cout << "origin_T: (" << origin_T[0] << ", " << origin_T[1] << ", " << origin_T[2] << ", " << origin_T[3] << ")\n";

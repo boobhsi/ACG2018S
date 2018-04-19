@@ -1,5 +1,8 @@
 #include <objects/object_sphere.h>
 #include <cmath>
+#include <raytracer/raytracer.h>
+
+extern Raytracer* rt;
 
 #ifdef DEBUG
 #include <iostream>
@@ -17,6 +20,9 @@ Sphere::Sphere(float x, float y, float z, float r) {
 }
 
 Intersection_info Sphere::checkIntersection(Ray& nRay) {
+
+    rt->cal_once();
+
     vec4 d = nRay.getVector();
     vec4 o = nRay.getOrigin();
     vec4 temp = o - centerR_T;

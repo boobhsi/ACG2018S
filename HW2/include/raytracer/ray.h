@@ -8,7 +8,7 @@
 
 class Raytracer;
 
-#define RECURSIVE_LIMIT 7
+#define RECURSIVE_LIMIT 2
 using namespace std;
 
 class Ray
