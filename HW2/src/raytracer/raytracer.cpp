@@ -18,6 +18,7 @@ static vec3 always_up_axis(0.0, 1.0, 0.0);
 Raytracer::Raytracer() {
     scene = nullptr;
     current = nullptr;
+    resolution_rate = 1;
 }
 
 void Raytracer::set_eye(vec3 input) {
@@ -152,7 +153,8 @@ void Raytracer::start_trace() {
 
     //left-hand coordinate
 
-
+    resolution[0] *= resolution_rate;
+    resolution[1] *= resolution_rate;
 
     create_scene();
     calculate_transform();
@@ -199,7 +201,7 @@ void Raytracer::start_trace() {
 #endif   
 }
 
-void Raytracer::output_file(char* path) {
+void Raytracer::output_file(char* path, char* bench) {
     ColorImage image;
 
     image.init(resolution[0], resolution[1]);
@@ -244,7 +246,7 @@ void Raytracer::output_file(char* path) {
 #endif
 
     ofstream file;
-    file.open("benchmark.txt", ios::out | ios::trunc);
+    file.open(bench, ios::out | ios::trunc);
     if(!file) {
         cout << "open file error" <<endl;
     }
@@ -260,6 +262,8 @@ void Raytracer::output_file(char* path) {
     }
     file << "Duration: " << hr << ":" << min << ":" << sec << endl;
     file << "Primitives: " << cal_num <<endl;
+
+    file.close();
 }
 
 Raytracer::~Raytracer() {
@@ -360,4 +364,9 @@ void Raytracer::destroy_scene() {
 void Raytracer::cal_once() {
     cal_num += 1;
 }
+
 long long int Raytracer::cal_num;
+
+void Raytracer::set_resolution_rate(int i) {
+    resolution_rate = i;
+}

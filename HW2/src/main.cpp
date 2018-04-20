@@ -10,7 +10,9 @@ using namespace std;
 Raytracer* rt;
 
 int main(int argc, char* argv[]) {
-    rt = new Raytracer();;
+    rt = new Raytracer();
+    string num(argv[4]);
+    rt->set_resolution_rate(stoi(num));
     fstream input_file;
     input_file.open(argv[1], ios::in);
     char temp_char[200];
@@ -87,6 +89,6 @@ int main(int argc, char* argv[]) {
     }
 
     rt->start_trace();
-    rt->output_file(argv[2]);
+    rt->output_file(argv[2], argv[3]);
     delete rt;
 }

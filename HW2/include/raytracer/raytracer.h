@@ -30,16 +30,19 @@ public:
     void create_light(float x, float y, float z);
     vec3 get_shading(vec4 pos, vec4 view, vec4 norm, vec3 color, vec3 properties, float specular, int object_index); 
     void start_trace();
-    void output_file(char* path);
+    void output_file(char* path, char* bench);
     ~Raytracer();
 
     static void cal_once();
+    void set_resolution_rate(int i);
 
 private:
 
     static long long int cal_num;
 
     clock_t sTime, eTime;
+
+    int resolution_rate;
 
     void attach_object(Object* object);
     void register_mesh();
