@@ -4,7 +4,3 @@
 ./main.out test/Input_Suzanne.txt output/2048s.ppm bench/2048s_bench.txt 4
 ./main.out test/Input_Suzanne.txt output/4096s.ppm bench/4096s_bench.txt 5
 ./main.out test/Input_Bunny.txt output/256b.ppm bench/256b_bench.txt 1
-./main.out test/Input_Bunny.txt output/512b.ppm bench/512b_bench.txt 2
-./main.out test/Input_Bunny.txt output/1024b.ppm bench/1024b_bench.txt 3
-./main.out test/Input_Bunny.txt output/2048b.ppm bench/2048b_bench.txt 4
-./main.out test/Input_Bunny.txt output/4096b.ppm bench/4096b_bench.txt 5

@@ -1,0 +1,2 @@
+Duration: 0:4:9.89186
+Primitives: 507944360
