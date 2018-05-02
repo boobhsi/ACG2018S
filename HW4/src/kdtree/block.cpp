@@ -33,6 +33,11 @@ void Block::draw() {
     boundary[9]->set_points(points[6], points[5], points[7]);
     boundary[10]->set_points(points[7], points[5], points[1]);
     boundary[11]->set_points(points[7], points[1], points[3]);
+
+    float x = points[0][0] - points[4][0];
+    float y = points[0][1] - points[2][1];
+    float z = points[1][2] - points[0][2];
+    area = 2 * (x * y + y * z + x * z);
 }
 
 Intersection_info Block::checkIntersection(Ray& nray) {
@@ -127,5 +132,51 @@ void Block::init_box() {
 bool Block::isInside(Ray& nray) {
     vec4 o = nray.getOrigin();
     return o[0] < points[0][0] && o[0] > points[4][0] && o[1] < points[0][1] && o[1] > points[2][1] && o[2] < points[1][2] && o[2] > points[0][2];
+}
+
+float Block::get_max_x() {
+    return mbx.m_x;
+}
+    
+float Block::get_min_x() {
+    return mbx.s_x;
+}
+
+float Block::get_max_y() {
+    return mbx.m_y;
+}
+
+float Block::get_min_y() {
+    return mbx.s_y;
+}
+
+float Block::get_max_z() {
+    return mbx.m_z;
+}
+
+float Block::get_min_z() {
+    return mbx.s_z;
+}
+
+vec4 Block::get_center() {
+    vec4 temp;
+    temp.set((mbx.m_x + mbx.s_x) / 2, (mbx.m_y + mbx.s_y) / 2, (mbx.m_z + mbx.s_z) / 2, 1.0f);
+    return temp;
+}
+
+float Block::get_height() {
+    return mbx.m_x - mbx.s_x;
+}
+    
+float Block::get_width() {
+    return mbx.m_y - mbx.s_y;
+}
+    
+float Block::get_depth() {
+    return mbx.m_z - mbx.s_z;
+}
+
+float Block::get_area() {
+    return area;
 }
 

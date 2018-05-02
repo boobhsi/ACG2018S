@@ -1,14 +1,13 @@
 #include <objects/object_triangle.h>
 #include <raytracer/raytracer.h>
 #include <cmath>
+#include <constants.h>
 
 using namespace std;
 
 #ifdef DEBUG
 #include <iostream>
 #endif
-
-#define BOX_OFFSET 0.0001f
 
 extern Raytracer* rt;
 

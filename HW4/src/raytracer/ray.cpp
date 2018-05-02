@@ -1,10 +1,7 @@
 #include <raytracer/ray.h>
 #include <raytracer/raytracer.h>
 #include <iostream>
-
-#define AIR_D 1.0
-#define SAME_POINT_THRESHOLD 0.0001
-#define OFFSET 0.0001
+#include <constants.h>
 
 #ifdef DEBUG
 #include <iostream>

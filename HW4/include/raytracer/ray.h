@@ -9,7 +9,6 @@
 #include <kdtree/kdtree.h>
 #include <kdtree/kdtree_node.h>
 
-#define RECURSIVE_LIMIT 2
 using namespace std;
 
 class Ray

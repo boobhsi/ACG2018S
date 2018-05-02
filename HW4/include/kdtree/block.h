@@ -20,12 +20,24 @@ public:
     void init_box();
     void draw();
     bool isInside(Ray& nray);
+    float get_max_x();
+    float get_min_x();
+    float get_max_y();
+    float get_min_y();
+    float get_max_z();
+    float get_min_z();
+    vec4 get_center();
+    float get_height();
+    float get_width();
+    float get_depth();
+    float get_area();
 private:
     void init(vec4 p1, vec4 p2, vec4 p3, vec4 p4, vec4 p5, vec4 p6, vec4 p7, vec4 p8);
     static const int BLOCK_TRIANGLE_NUM = 12;
     Triangle** boundary;
     vec4 points[8];
     BoundingBox mbx;
+    float area;
 };
 
 #endif

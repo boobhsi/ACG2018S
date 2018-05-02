@@ -1,0 +1,19 @@
+#ifndef CONSTANT_H
+#define CONSTANT_H
+
+#define RECURSIVE_LIMIT 2
+#define AIR_D 1.0
+#define PI 3.14159265
+#define AMBIENT_ILLUSION 1
+#define LIGHT_POWER 20.0
+#define OFFSET 0.0001
+#define BOX_OFFSET 0.0001f
+#define LAYER_LIMIT 10000
+#define BLOCK_MINIMUM 24
+#define SAME_POINT_THRESHOLD 0.0001
+//#define KDTREE_MEDIAN
+#define KDTREE_SAH
+#define TRAVERSE_COST 12
+#define INTERSECTION_COST 1
+
+#endif

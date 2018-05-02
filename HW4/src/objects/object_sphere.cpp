@@ -2,14 +2,13 @@
 #include <objects/object_sphere.h>
 #include <cmath>
 #include <raytracer/raytracer.h>
+#include <constants.h>
 
 extern Raytracer* rt;
 
 #ifdef DEBUG
 #include <iostream>
 #endif
-
-#define BOX_OFFSET 0.0001f
 
 using namespace std;
 
