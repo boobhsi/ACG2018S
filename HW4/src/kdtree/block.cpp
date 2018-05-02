@@ -180,3 +180,10 @@ float Block::get_area() {
     return area;
 }
 
+Block::~Block() {
+    for(int i = 0; i < BLOCK_TRIANGLE_NUM; i++) {
+        delete boundary[i];
+    }
+    delete [] boundary;
+}
+

@@ -15,6 +15,9 @@ KDTreeNode::KDTreeNode(int l) {
 
 void KDTreeNode::build(int axis) {
     if(!haveBlock) {
+        if(mBlock != nullptr) {
+            delete mBlock;
+        }
         mBlock = new Block(object_list[0]->get_box());
         for(size_t i = 1; i < object_list.size(); i++) {
             mBlock->extend(object_list[i]->get_box());
@@ -26,6 +29,7 @@ void KDTreeNode::build(int axis) {
         isLeaf = true;
         return;
     }
+
 #ifdef KDTREE_MEDIAN
     Object* median = nullptr;
     vector<Object*> left_list;
@@ -89,7 +93,7 @@ void KDTreeNode::build(int axis) {
         }
     }
     assert(median != nullptr);
-    if(left_list.size() < BLOCK_MINIMUM || right_list.size() < BLOCK_MINIMUM || repeat > (object_list.size() / 2)) {
+    if(repeat > ((float)object_list.size() / 2.0f) || left_list.size() < BLOCK_MINIMUM || right_list.size() < BLOCK_MINIMUM) {
         isLeaf = true;
         return;
     }
@@ -105,6 +109,10 @@ void KDTreeNode::build(int axis) {
 #endif
 
 #ifdef KDTREE_SAH
+    if(object_list.size() < BLOCK_MINIMUM) {
+        isLeaf = true;
+        return;
+    }
     vector<Object*> left_list;
     vector<Object*> right_list;
     vector<SAHCandidate> sah_list[3];
@@ -134,8 +142,8 @@ void KDTreeNode::build(int axis) {
                             SAHCandidate temp(object_list[i]->get_box().s_x, TRIANGLE_START);
                             sah_list[list_i].push_back(temp);
                         }
-                        break;
                     }
+                    break;
                 }
                 case 1: {
                     if(object_list[i]->get_box().s_y < mBlock->get_min_y()) {
@@ -180,8 +188,8 @@ void KDTreeNode::build(int axis) {
                             SAHCandidate temp(object_list[i]->get_box().s_z, TRIANGLE_START);
                             sah_list[list_i].push_back(temp);
                         }
-                        break;
                     }
+                    break;
                 }
             }
         }
@@ -306,10 +314,10 @@ void KDTreeNode::build(int axis) {
         }
     }
 
-   if(left_list.size() < BLOCK_MINIMUM || right_list.size() < BLOCK_MINIMUM || repeat > (object_list.size() / 2)) {
+    if(((float)object_list.size() / 2.0f)) {
         isLeaf = true;
-       return;
-   }
+        return;
+    }
     
     mLeft = new KDTreeNode(layer + 1);
     mLeft->object_list = left_list;

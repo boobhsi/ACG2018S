@@ -14,6 +14,7 @@ class Block {
 public:
     Block(vec4 p1, vec4 p2, vec4 p3, vec4 p4, vec4 p5, vec4 p6, vec4 p7, vec4 p8);
     Block(BoundingBox bx);
+    ~Block();
     Intersection_info checkIntersection(Ray& nray);
     BlockSet slash(int axis, float pos);
     void extend(BoundingBox bx);
