@@ -88,13 +88,13 @@ public:
     static T* getMedian(vector<T*>& list) {
         return median_of_median(list, compare_by);
     }
-private:
-    XMedianFactory();
     static bool compare_by(T* l, T* r) {
         T& lr = *l;
         T& rr = *r;
         return lr[0] < rr[0];
     }
+private:
+    XMedianFactory();
 };
 
 template<class T>
@@ -104,13 +104,13 @@ public:
     static T* getMedian(vector<T*>& list) {
         return median_of_median(list, compare_by);
     }
-private:
-    YMedianFactory();
     static bool compare_by(T* l, T* r) {
         T& lr = *l;
         T& rr = *r;
         return lr[1] < rr[1];
     }
+private:
+    YMedianFactory();
 };
 
 template<class T>
@@ -120,13 +120,13 @@ public:
     static T* getMedian(vector<T*>& list) {
         return median_of_median(list, compare_by);
     }
-private:
-    ZMedianFactory();
     static bool compare_by(T* l, T* r) {
         T& lr = *l;
         T& rr = *r;
         return lr[2] < rr[2];
     }
+private:
+    ZMedianFactory();
 };
 
 #endif

@@ -4,6 +4,11 @@
 #include <constants.h>
 #include <algorithm>
 
+#ifdef DEBUG
+#include <iostream>
+using namespace std;
+#endif
+
 KDTreeNode::KDTreeNode(int l) {
     mLeft = nullptr;
     mRight = nullptr;
@@ -26,18 +31,44 @@ void KDTreeNode::build(int axis) {
         mBlock->draw();
     }
     if(layer == LAYER_LIMIT) {
-        isLeaf = true;
+        finalize();
+        return;
+    }
+    if((object_list.size() + overlap_list.size()) < BLOCK_MINIMUM) {
+        finalize();
         return;
     }
 
 #ifdef KDTREE_MEDIAN
+    if(object_list.size() == 0) {
+        finalize();
+        return;
+    }
+
+    if(object_list.size() < overlap_list.size()) {
+        finalize();
+        return;
+    }
+
     Object* median = nullptr;
-    vector<Object*> left_list;
-    vector<Object*> right_list;
-    size_t repeat = 0;
+    vector<Object*> left_list, both_overlap_list, right_list;
+    float split_point = 0.0f;
     switch(axis) {
         case 0: {
             median = XMedianFactory<Object>::getMedian(object_list);
+            split_point = (*median)[0];
+
+#ifdef DEBUG
+            vector<Object*> test_list = object_list;
+            sort(test_list.begin(), test_list.end(), XMedianFactory<Object>::compare_by);
+            float test_median = (*test_list[test_list.size() / 2])[0];
+            cout << test_median << " : " << (*median)[0] <<endl;
+            split_point = test_median;
+#endif
+
+            for(size_t i = 0; i < overlap_list.size(); i++) {
+                object_list.push_back(overlap_list[i]);
+            }
             for(size_t i = 0; i < object_list.size(); i++) {
                 if(object_list[i]->get_box().m_x < (*median)[0]) {
                     left_list.push_back(object_list[i]);
@@ -46,15 +77,26 @@ void KDTreeNode::build(int axis) {
                     right_list.push_back(object_list[i]);
                 }
                 else {
-                    left_list.push_back(object_list[i]);
-                    right_list.push_back(object_list[i]);
-                    repeat += 1;
+                    both_overlap_list.push_back(object_list[i]);
                 }
             }
             break;
         }
         case 1: {
             median = YMedianFactory<Object>::getMedian(object_list);
+            split_point = (*median)[1];
+
+#ifdef DEBUG
+            vector<Object*> test_list = object_list;
+            sort(test_list.begin(), test_list.end(), YMedianFactory<Object>::compare_by);
+            float test_median = (*test_list[test_list.size() / 2])[1];
+            cout << test_median << " : " << (*median)[1] <<endl;
+            split_point = test_median;
+#endif
+
+            for(size_t i = 0; i < overlap_list.size(); i++) {
+                object_list.push_back(overlap_list[i]);
+            }
             for(size_t i = 0; i < object_list.size(); i++) {
                 if(object_list[i]->get_box().m_y < (*median)[1]) {
                     left_list.push_back(object_list[i]);
@@ -63,15 +105,26 @@ void KDTreeNode::build(int axis) {
                     right_list.push_back(object_list[i]);
                 }
                 else {
-                    left_list.push_back(object_list[i]);
-                    right_list.push_back(object_list[i]);
-                    repeat += 1;
+                    both_overlap_list.push_back(object_list[i]);
                 }
             }
             break;
         }
         case 2: {
             median = ZMedianFactory<Object>::getMedian(object_list);
+            split_point = (*median)[2];
+
+#ifdef DEBUG
+            vector<Object*> test_list = object_list;
+            sort(test_list.begin(), test_list.end(), ZMedianFactory<Object>::compare_by);
+            float test_median = (*test_list[test_list.size() / 2])[2];
+            cout << test_median << " : " << (*median)[2] <<endl;
+            split_point = test_median;
+#endif
+
+            for(size_t i = 0; i < overlap_list.size(); i++) {
+                object_list.push_back(overlap_list[i]);
+            }
             for(size_t i = 0; i < object_list.size(); i++) {
                 if(object_list[i]->get_box().m_z < (*median)[2]) {
                     left_list.push_back(object_list[i]);
@@ -80,41 +133,48 @@ void KDTreeNode::build(int axis) {
                     right_list.push_back(object_list[i]);
                 }
                 else {
-                    left_list.push_back(object_list[i]);
-                    right_list.push_back(object_list[i]);
-                    repeat += 1;
+                    both_overlap_list.push_back(object_list[i]);
                 }
             }
             break;
         }
         default: {
-            median = nullptr;
+            assert(0);
             break;
         }
     }
-    assert(median != nullptr);
-    if(repeat > ((float)object_list.size() / 2.0f) || left_list.size() < BLOCK_MINIMUM || right_list.size() < BLOCK_MINIMUM) {
-        isLeaf = true;
-        return;
-    }
-    else {
-        int new_axis = (axis + 1) % 3;
-        mLeft = new KDTreeNode(layer + 1);
-        mLeft->object_list = left_list;
-        mRight = new KDTreeNode(layer + 1);
-        mRight->object_list = right_list;
-        mLeft->build(new_axis);
-        mRight->build(new_axis);
-    }
+
+#ifdef DEBUG
+    cout << "Mid: flag=" << mFlag << ", layey=" << layer << ", size=" << object_list.size() << ", left=" << left_list.size() << ", right=" << right_list.size() << ", overlap=" << both_overlap_list.size() <<endl;
+#endif
+
+    int new_axis = (axis + 1) % 3;
+    mLeft = new KDTreeNode(layer + 1);
+    mLeft->mFlag = this->append('l');
+    mLeft->object_list = left_list;
+    mLeft->overlap_list = both_overlap_list;
+    mRight = new KDTreeNode(layer + 1);
+    mRight->mFlag = this->append('r');
+    mRight->object_list = right_list;
+    mRight->overlap_list = both_overlap_list;
+
+    BlockSet lrb = mBlock->slash(axis, split_point);
+
+    lrb.first->draw();
+    lrb.second->draw();
+    mLeft->set_block(lrb.first);
+    mRight->set_block(lrb.second);
+    mLeft->build(new_axis);
+    mRight->build(new_axis);
+
 #endif
 
 #ifdef KDTREE_SAH
-    if(object_list.size() < BLOCK_MINIMUM) {
-        isLeaf = true;
-        return;
+    for(size_t i = 0; i < overlap_list.size(); i++) {
+        object_list.push_back(overlap_list[i]);
     }
-    vector<Object*> left_list;
-    vector<Object*> right_list;
+
+    vector<Object*> left_list, left_overlap_list, right_list, both_overlap_list;
     vector<SAHCandidate> sah_list[3];
     int left_collided[3];
     int both_collided[3];
@@ -196,7 +256,7 @@ void KDTreeNode::build(int axis) {
         sort(sah_list[list_i].begin(), sah_list[list_i].end(), compare_splitting_point);
         left_collided[list_i] = lc;
         both_collided[list_i] = bc;
-     }
+    }
     int max_axis = 0;
     float min_cost = 1000000000.0f;
     float split_point = 0.0f;
@@ -243,9 +303,9 @@ void KDTreeNode::build(int axis) {
                 }
             }
 
-            float cost = TRAVERSE_COST + INTERSECTION_COST * ( (nl + both_collided[list_i]) * l_area + (nr + both_collided[list_i]) * r_area ) / mBlock->get_area();
+            float cost = TRAVERSE_COST + INTERSECTION_COST * ( nl * l_area + nr * r_area ) / mBlock->get_area() + OVERLAP_COST * (float)both_collided[list_i] / object_list.size();
 
-            if(min_cost > cost && cost < current_cost) {
+            if(min_cost > cost) {
                 max_axis = list_i;
                 split_point = temp_point;
                 min_cost = cost;
@@ -254,11 +314,13 @@ void KDTreeNode::build(int axis) {
         }
     }
 
-    size_t repeat = 0;
-
     if(!found_point) {
-        isLeaf = true;
-        return;
+        finalize();
+    }
+
+
+    if(min_cost > current_cost) {
+        finalize();
     }
 
     assert(max_axis < 3 && max_axis > -1);
@@ -273,9 +335,7 @@ void KDTreeNode::build(int axis) {
                     right_list.push_back(object_list[i]);
                 }
                 else {
-                    left_list.push_back(object_list[i]);
-                    right_list.push_back(object_list[i]);
-                    repeat += 1;
+                    both_overlap_list.push_back(object_list[i]);
                 }
             }
             break;
@@ -289,9 +349,7 @@ void KDTreeNode::build(int axis) {
                     right_list.push_back(object_list[i]);
                 }
                 else {
-                    left_list.push_back(object_list[i]);
-                    right_list.push_back(object_list[i]);
-                    repeat += 1;
+                    both_overlap_list.push_back(object_list[i]);
                 }
             }
             break;
@@ -305,24 +363,25 @@ void KDTreeNode::build(int axis) {
                     right_list.push_back(object_list[i]);
                 }
                 else {
-                    left_list.push_back(object_list[i]);
-                    right_list.push_back(object_list[i]);
-                    repeat += 1;
+                    both_overlap_list.push_back(object_list[i]);
                 }
             }
             break;
         }
     }
 
-    if(((float)object_list.size() / 2.0f)) {
-        isLeaf = true;
-        return;
-    }
+#ifdef DEBUG
+    cout << "Mid: flag=" << mFlag << ", layey=" << layer << ", size=" << object_list.size() << ", left=" << left_list.size() << ", right=" << right_list.size() << ", overlap=" << both_overlap_list.size() <<endl;
+#endif
     
     mLeft = new KDTreeNode(layer + 1);
     mLeft->object_list = left_list;
+    mLeft->mFlag = this->append('l');
+    mLeft->overlap_list = both_overlap_list;
     mRight = new KDTreeNode(layer + 1);
     mRight->object_list = right_list;
+    mRight->mFlag = this->append('r');
+    mRight->overlap_list = both_overlap_list;
 
     BlockSet lrb = mBlock->slash(max_axis, split_point);
 
@@ -363,4 +422,29 @@ void KDTreeNode::set_block(Block* in) {
 
 bool KDTreeNode::compare_splitting_point(SAHCandidate i, SAHCandidate j) {
     return (i.first < j.first);
+}
+
+string KDTreeNode::append(char i) {
+    string si(&i);
+    string answer = mFlag + si;
+    return answer;
+}
+
+string KDTreeNode::getFlag() {
+    return mFlag;
+}
+
+void KDTreeNode::finalize() {
+
+#ifdef DEBUG
+    cout << "Finalization: flag=" << mFlag << ", layey=" << layer << ", size=" << object_list.size() << ", overlap=" << overlap_list.size() << endl;
+#endif
+
+    isLeaf = true;
+
+#ifdef MEDIAN
+    for(size_t i = 0; i < overlap_list.size(); i++) {
+        object_list.push_back(overlap_list[i]);
+    }
+#endif
 }

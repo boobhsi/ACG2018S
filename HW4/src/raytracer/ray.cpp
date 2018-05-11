@@ -10,6 +10,8 @@ using namespace std;
 
 extern Raytracer* rt;
 
+//static const string DEBUG_FLAG = "nlr";
+
 vec4 Ray::getOrigin() {
     return Ray::origin;
 }
@@ -85,10 +87,25 @@ Intersection_info Ray::trace_the_node(KDTreeNode* node, Object* ptr) {
 
 Intersection_info Ray::trace_the_tree(KDTreeNode* node, Object* ptr) {
     Intersection_info nearest_intersection, block_nearest_intersection;
+
     if(node->is_leaf()) {
+//        if(node->getFlag().compare(DEBUG_FLAG) != 0) {
+//            return nearest_intersection;
+//        }
         nearest_intersection = trace_the_node(node, ptr);
     }
     else {
+
+//            nearest_intersection = trace_the_tree(node->get_left(), ptr);
+//        block_nearest_intersection = trace_the_tree(node->get_right(), ptr);
+//        if(!nearest_intersection.intersected) return block_nearest_intersection;
+//        else if(!block_nearest_intersection.intersected) return nearest_intersection;
+//        else {
+//            if(nearest_intersection.t < block_nearest_intersection.t) return nearest_intersection;
+//            else return block_nearest_intersection;
+//        }
+
+
         Intersection_info l_intersected, r_intersected;
         block_nearest_intersection = node->get_left()->get_block().checkIntersection(*this);
         if(!block_nearest_intersection.intersected) { //doesnt hit left block
@@ -107,8 +124,8 @@ Intersection_info Ray::trace_the_tree(KDTreeNode* node, Object* ptr) {
             }
             else { //hit right block
                 float t_r = block_nearest_intersection.t;
-                bool li = node->get_left()->get_block().isInside(*this);
-                bool ri = node->get_right()->get_block().isInside(*this);
+               // bool li = node->get_left()->get_block().isInside(*this);
+               // bool ri = node->get_right()->get_block().isInside(*this);
                 if(t_l > t_r) {
                     r_intersected = trace_the_tree(node->get_right(), ptr); 
                     if(!r_intersected.intersected) {
@@ -116,6 +133,7 @@ Intersection_info Ray::trace_the_tree(KDTreeNode* node, Object* ptr) {
                         nearest_intersection = l_intersected;
                     }
                     else {
+                        /*
                         if(li) {
                             l_intersected = trace_the_tree(node->get_left(), ptr);
                             if(l_intersected.intersected) {
@@ -130,7 +148,8 @@ Intersection_info Ray::trace_the_tree(KDTreeNode* node, Object* ptr) {
                                 nearest_intersection = r_intersected;
                             }
                         }
-                        else if(t_l < r_intersected.t) {
+                        else */
+                        if(t_l < r_intersected.t) {
                             l_intersected = trace_the_tree(node->get_left(), ptr);
                             if(l_intersected.intersected) {
                                 if(r_intersected.t > l_intersected.t) {
@@ -145,6 +164,7 @@ Intersection_info Ray::trace_the_tree(KDTreeNode* node, Object* ptr) {
                             }
                         }
                         else {
+                            
                             nearest_intersection = r_intersected;
                         }
                     }
@@ -156,6 +176,7 @@ Intersection_info Ray::trace_the_tree(KDTreeNode* node, Object* ptr) {
                         nearest_intersection = r_intersected;
                     }
                     else {
+                        /*
                         if(ri) {
                             r_intersected = trace_the_tree(node->get_right(), ptr);
                             if(r_intersected.intersected) {
@@ -170,7 +191,8 @@ Intersection_info Ray::trace_the_tree(KDTreeNode* node, Object* ptr) {
                                 nearest_intersection = l_intersected;
                             }
                         }
-                        else if(t_r < l_intersected.t) {
+                        else */
+                        if(t_r < l_intersected.t) {
                             r_intersected = trace_the_tree(node->get_right(), ptr);
                             if(r_intersected.intersected) {
                                 if(r_intersected.t > l_intersected.t) {
@@ -185,6 +207,7 @@ Intersection_info Ray::trace_the_tree(KDTreeNode* node, Object* ptr) {
                             }
                         }
                         else {
+                            
                             nearest_intersection = l_intersected;
                         }
                     }

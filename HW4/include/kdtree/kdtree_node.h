@@ -6,6 +6,7 @@
 #include <objects/object.h>
 #include <kdtree/kdtree_node.h>
 #include <vector>
+#include <string>
 
 using namespace std;
 
@@ -22,16 +23,21 @@ public:
     KDTreeNode* get_right();
     Block& get_block();
     vector<Object*>& get_objects();
+    string getFlag();
 private:
     Block* mBlock;
     KDTreeNode* mLeft;
     KDTreeNode* mRight;
+    string mFlag;
     vector<Object*> object_list;
+    vector<Object*> overlap_list;
     int layer;
     bool isLeaf;
     bool haveBlock;
     void set_block(Block* in);
     static bool compare_splitting_point(SAHCandidate i, SAHCandidate j);
+    string append(char i);
+    void finalize();
 };
 
 #endif

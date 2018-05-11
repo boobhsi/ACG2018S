@@ -1,4 +1,5 @@
 #include <kdtree/block.h>
+#include <constants.h>
 
 Block::Block(vec4 p1, vec4 p2, vec4 p3, vec4 p4, vec4 p5, vec4 p6, vec4 p7, vec4 p8) {
     init(p1, p2, p3, p4, p5, p6, p7, p8);
@@ -13,6 +14,13 @@ void Block::init(vec4 p1, vec4 p2, vec4 p3, vec4 p4, vec4 p5, vec4 p6, vec4 p7, 
     points[5] = p6;
     points[6] = p7;
     points[7] = p8;
+
+    mbx.m_x = p2[0];
+    mbx.s_x = p7[0];
+    mbx.m_y = p2[1];
+    mbx.s_y = p7[1];
+    mbx.m_z = p2[2];
+    mbx.s_z = p7[2];
 }
 
 void Block::draw() {
@@ -43,6 +51,7 @@ void Block::draw() {
 Intersection_info Block::checkIntersection(Ray& nray) {
     //find nearest object, return nearest surface
     Intersection_info n_i;
+    /* 
     for(int i = 0; i < BLOCK_TRIANGLE_NUM; i++) {
         Intersection_info temp_intersect = boundary[i]->checkIntersection(nray);
         if(temp_intersect.intersected) {
@@ -56,6 +65,39 @@ Intersection_info Block::checkIntersection(Ray& nray) {
             }
         }
     }
+    */
+    float tmin = 1.0f, tmax = -1.0f;
+    //vec4 direction_inv(1 / nray.getVector()[0], 1 / nray.getVector()[1], 1 / nray.getVector()[2], 0.0f);
+    if(nray.getVector()[0] > 0.0f || nray.getVector()[0] < 0.0f) {
+        float x_inv = 1 / nray.getVector()[0];
+        float tx1 = max((points[6][0] - nray.getOrigin()[0]) * x_inv, 0.0f);
+        float tx2 = max((points[1][0] - nray.getOrigin()[0]) * x_inv, 0.0f);
+
+        tmin = std::min(tx1, tx2);
+        tmax = std::max(tx1, tx2);
+    }
+
+    if(nray.getVector()[1] > 0.0f || nray.getVector()[1] < 0.0f) {
+        float y_inv = 1 / nray.getVector()[1];
+        float ty1 = max((points[6][1] - nray.getOrigin()[1]) * y_inv, 0.0f);
+        float ty2 = max((points[1][1] - nray.getOrigin()[1]) * y_inv, 0.0f);
+
+        tmin = std::min(tmin, std::min(ty1, ty2));
+        tmax = std::max(tmax, std::max(ty1, ty2));
+    }
+
+    if(nray.getVector()[2] > 0.0f || nray.getVector()[2] < 0.0f) {
+        float z_inv = 1 / nray.getVector()[2];
+        float tz1 = max((points[6][2] - nray.getOrigin()[2]) * z_inv, 0.0f);
+        float tz2 = max((points[1][2] - nray.getOrigin()[2]) * z_inv, 0.0f);
+
+        tmin = std::min(tmin, std::min(tz1, tz2));
+        tmax = std::max(tmax, std::max(tz1, tz2));
+    }
+
+    n_i.intersected = (tmax > tmin);
+    n_i.t = tmin;
+    
     return n_i;
 }
 
