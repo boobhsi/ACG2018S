@@ -2,8 +2,8 @@
 #include <utils/median_factory.h>
 #include <cassert>
 
-#define LAYER_LIMIT 1300
-#define BLOCK_MINIMUM 12
+#define LAYER_LIMIT 10
+#define BLOCK_MINIMUM 24
 
 KDTreeNode::KDTreeNode(int l) {
     mLeft = nullptr;
@@ -40,7 +40,7 @@ void KDTreeNode::build(int axis) {
                 }
                 else {
                     left_list.push_back(object_list[i]);
-                    right_list.push_back(object_list[i]);
+                    //right_list.push_back(object_list[i]);
                     repeat += 1;
                 }
             }
@@ -57,7 +57,7 @@ void KDTreeNode::build(int axis) {
                 }
                 else {
                     left_list.push_back(object_list[i]);
-                    right_list.push_back(object_list[i]);
+                    //right_list.push_back(object_list[i]);
                     repeat += 1;
                 }
             }
@@ -74,7 +74,7 @@ void KDTreeNode::build(int axis) {
                 }
                 else {
                     left_list.push_back(object_list[i]);
-                    right_list.push_back(object_list[i]);
+                    //right_list.push_back(object_list[i]);
                     repeat += 1;
                 }
             }

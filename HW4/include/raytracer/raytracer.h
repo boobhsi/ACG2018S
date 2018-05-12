@@ -40,7 +40,7 @@ private:
 
     static long long int cal_num;
 
-    clock_t sTime, eTime;
+    clock_t sTime, eTime, bTime;
 
     int resolution_rate;
 

@@ -38,6 +38,7 @@ void Block::draw() {
 Intersection_info Block::checkIntersection(Ray& nray) {
     //find nearest object, return nearest surface
     Intersection_info n_i;
+    /* 
     for(int i = 0; i < BLOCK_TRIANGLE_NUM; i++) {
         Intersection_info temp_intersect = boundary[i]->checkIntersection(nray);
         if(temp_intersect.intersected) {
@@ -51,6 +52,42 @@ Intersection_info Block::checkIntersection(Ray& nray) {
             }
         }
     }
+    */
+    float tmin = -10000000000.0f, tmax = 10000000000.0f;
+    bool intersected = false;
+    //vec4 direction_inv(1 / nray.getVector()[0], 1 / nray.getVector()[1], 1 / nray.getVector()[2], 0.0f);
+    if(nray.getVector()[0] > 0.0f || nray.getVector()[0] < 0.0f) {
+        float x_inv = 1 / nray.getVector()[0];
+        float tx1 = (points[6][0] - nray.getOrigin()[0]) * x_inv;
+        float tx2 = (points[1][0] - nray.getOrigin()[0]) * x_inv;
+
+        tmin = std::min(tx1, tx2);
+        tmax = std::max(tx1, tx2);
+        intersected = true;
+    }
+    if(nray.getVector()[1] > 0.0f || nray.getVector()[1] < 0.0f) {
+        float y_inv = 1 / nray.getVector()[1];
+        float ty1 = (points[6][1] - nray.getOrigin()[1]) * y_inv;
+        float ty2 = (points[1][1] - nray.getOrigin()[1]) * y_inv;
+
+        tmin = std::max(tmin, std::min(ty1, ty2));
+        tmax = std::min(tmax, std::max(ty1, ty2));
+        intersected = true;
+    }
+
+    if(nray.getVector()[2] > 0.0f || nray.getVector()[2] < 0.0f) {
+        float z_inv = 1 / nray.getVector()[2];
+        float tz1 = (points[6][2] - nray.getOrigin()[2]) * z_inv;
+        float tz2 = (points[1][2] - nray.getOrigin()[2]) * z_inv;
+
+        tmin = std::max(tmin, std::min(tz1, tz2));
+        tmax = std::min(tmax, std::max(tz1, tz2));
+        intersected = true;
+    }
+
+    n_i.intersected = (tmax >= tmin) && intersected;
+    n_i.t = tmin;
+    
     return n_i;
 }
 

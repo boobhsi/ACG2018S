@@ -127,13 +127,16 @@ void Raytracer::start_trace() {
     vec4 left_top_corner(0.0f - width / 2, 0.0f + height / 2, distance, 1.0f);
     vec4 eye_o(0.0f, 0.0f, 0.0f, 1.0f);
 
+    sTime = clock();
+
     tree = new KDTree();
     tree->build_tree(object_list);
 
     cout << "build_finish\n";
 
+    bTime = clock();
+
     cal_num = 0;
-    sTime = clock();
 
     for(int i = 0; i < resolution[1]; i++) {
         for(int j = 0; j < resolution[0]; j++) {
@@ -180,7 +183,7 @@ void Raytracer::output_file(char* path, char* bench) {
     if(!file) {
         cout << "open file error" <<endl;
     }
-    double sec = (eTime - sTime) / (double)(CLOCKS_PER_SEC);
+    double sec = (bTime - sTime) / (double)(CLOCKS_PER_SEC);
     int hr = 0, min = 0;
     if(sec > 3600.0) {
         hr = sec / 3600.0;
@@ -190,7 +193,27 @@ void Raytracer::output_file(char* path, char* bench) {
         min = sec / 60.0;
         sec -= 60.0 * min;
     }
-    file << "Duration: " << hr << ":" << min << ":" << sec << endl;
+    file << "Building Duration: " << hr << ":" << min << ":" << sec << endl;
+    sec = (eTime - bTime) / (double)(CLOCKS_PER_SEC);
+    if(sec > 3600.0) {
+        hr = sec / 3600.0;
+        sec -= 3600.0 * hr;
+    }
+    if(sec > 60.0) {
+        min = sec / 60.0;
+        sec -= 60.0 * min;
+    }
+    file << "Traversing Duration: " << hr << ":" << min << ":" << sec << endl;
+    sec = (eTime - sTime) / (double)(CLOCKS_PER_SEC);
+    if(sec > 3600.0) {
+        hr = sec / 3600.0;
+        sec -= 3600.0 * hr;
+    }
+    if(sec > 60.0) {
+        min = sec / 60.0;
+        sec -= 60.0 * min;
+    }
+    file << "Total Duration: " << hr << ":" << min << ":" << sec << endl;
     file << "Primitives: " << cal_num <<endl;
 
     file.close();
